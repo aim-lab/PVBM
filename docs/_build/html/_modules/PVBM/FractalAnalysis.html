@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PVBM.FractalAnalysis &mdash; PVBM 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PVBM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GeometricalAnalysis.html">GeometricalAnalysis Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../FractalAnalysis.html">FractalAnalysis Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pvbmtutorial.html">PVBM Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PVBM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">PVBM.FractalAnalysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for PVBM.FractalAnalysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">skimage.io</span> <span class="k">as</span> <span class="nn">skio</span>
+<span class="kn">import</span> <span class="nn">skimage.transform</span> <span class="k">as</span> <span class="nn">sktransform</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="MultifractalVBMs"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs">[docs]</a><span class="k">class</span> <span class="nc">MultifractalVBMs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class which holds all required parameters and all the methods to perform</span>
+<span class="sd">        multifractal calculation on binary images.</span>
+
+<span class="sd">    :param int n_dim: maximum dimension used to calculate Singularity Length.</span>
+<span class="sd">    :param int n_rotations: number of rotations performed on the given image from which the optimal run will be chosen.</span>
+<span class="sd">    :param bool optimize: if True - an optimal run will be chosen from n_rotations runs, otherwise only 1 angle will be used.</span>
+<span class="sd">    :param float min_proba: a minimum probability for the occupancy of calculated boxes.</span>
+<span class="sd">                            Boxes with smaller probability will be ignored.</span>
+<span class="sd">    :param float max_proba: a maximum probability for the occupancy of calculated boxes.</span>
+<span class="sd">                            Boxes with higher probability will be ignored.</span>
+<span class="sd">    Example:</span>
+<span class="sd">        tar = &#39;example_arteries_586_LES_AV.png&#39;</span>
+<span class="sd">        sample_arteries_image = skio.imread(tar)</span>
+<span class="sd">        f_multi = FundusMultifractal()</span>
+<span class="sd">        out1 = f_multi.get_fundus_biomarkers(sample_arteries_image)</span>
+<span class="sd">        print(out1)</span>
+
+<span class="sd">        tar = &#39;sierpinski.png&#39;</span>
+<span class="sd">        example_monofractal_im = skio.imread(tar) / 255</span>
+<span class="sd">        f_multi = FundusMultifractal(n_rotations=10)</span>
+<span class="sd">        out2 = f_multi.get_fundus_biomarkers(example_monofractal_im)</span>
+<span class="sd">        print(out2)</span>
+
+<span class="sd">        tar = &#39;binhen.tif&#39;</span>
+<span class="sd">        example_multifractal_im = skio.imread(tar)/255</span>
+<span class="sd">        f_multi = FundusMultifractal(n_rotations=4)</span>
+<span class="sd">        out3 = f_multi.get_fundus_biomarkers(example_multifractal_im)</span>
+<span class="sd">        print(out3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_rotations</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_proba</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">maxproba</span><span class="o">=</span><span class="mf">0.98</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constractor&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_dim</span> <span class="o">=</span> <span class="n">n_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_rotations</span> <span class="o">=</span> <span class="n">n_rotations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimize</span> <span class="o">=</span> <span class="n">optimize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_occupancy_proba</span> <span class="o">=</span> <span class="p">[</span><span class="n">min_proba</span><span class="p">,</span> <span class="n">maxproba</span><span class="p">]</span>
+
+<div class="viewcode-block" id="MultifractalVBMs.get_fundus_biomarkers"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs.get_fundus_biomarkers">[docs]</a>    <span class="k">def</span> <span class="nf">get_fundus_biomarkers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            This method will be used to calculate the following dimensions: (D0, D1, D2, singularity length).</span>
+
+<span class="sd">            :param int image: (N,N) binary numpy array image.</span>
+<span class="sd">            :returns: A numpy array containing the [D0, D1, D2, Singularity Length] features.</span>
+<span class="sd">            :rtype: ndarray</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">rotations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_rotations</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimize</span><span class="p">:</span>
+            <span class="n">rotations</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">image_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_q_fractals</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">rotations</span><span class="o">=</span><span class="n">rotations</span><span class="p">,</span> <span class="n">dim_list</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">n_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_dim</span><span class="p">])</span>
+        <span class="n">first_three_dqs</span> <span class="o">=</span> <span class="n">image_stats</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimize</span><span class="p">:</span>
+            <span class="n">best_rotation_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimize_dqs</span><span class="p">(</span><span class="n">first_three_dqs</span><span class="p">)</span>
+            <span class="n">image_stats_opt</span> <span class="o">=</span> <span class="n">image_stats</span><span class="p">[</span><span class="n">best_rotation_index</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image_stats_opt</span> <span class="o">=</span> <span class="n">image_stats</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+        <span class="n">sing_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_singularity_length</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">image_stats_opt</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="n">three_dqs</span> <span class="o">=</span> <span class="n">image_stats_opt</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">three_dqs</span><span class="p">,</span> <span class="n">sing_features</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MultifractalVBMs.get_singularity_length"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs.get_singularity_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_singularity_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Calculates singularity length from f(alpha) singularity curve.</span>
+
+<span class="sd">            :param int alpha: 1D numpy array containing f(alpha) singularity curve values.</span>
+<span class="sd">            :returns: Singularity length of this f(alpha) curve.</span>
+<span class="sd">            :rtype: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">s_len</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">s_len</span></div>
+
+<div class="viewcode-block" id="MultifractalVBMs.get_multi_fractal_dimension"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs.get_multi_fractal_dimension">[docs]</a>    <span class="k">def</span> <span class="nf">get_multi_fractal_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Calculates Q dimension from the given binary image.</span>
+
+<span class="sd">            :param ndarray image: (N,N) binary numpy array image.</span>
+<span class="sd">            :param float q: q power of multi-fractal D_q which will be calculated from image.</span>
+<span class="sd">            :returns: 4-tuple of Multi-fractal calculations:</span>
+<span class="sd">                * Dq_slope - D_q value for given q.</span>
+<span class="sd">                * dq_r2 - R^2 of the fit of D_q.</span>
+<span class="sd">                * fq_slope - f(q) value for given q.</span>
+<span class="sd">                * alphaq_slope - \alpha(q) value for given q.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Only for 2d binary image</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Minimal dimension of image</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="c1"># create a linear sampling for epsilons</span>
+        <span class="n">epsilons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.6</span> <span class="o">*</span> <span class="n">p</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fq_numerators</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">alpha_q_numerators</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">epsilons</span><span class="p">:</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probability_per_pixel</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">box_occupancy_proba</span><span class="p">)</span>
+            <span class="c1"># If all pixels were filtered, try again with no limit on pixel occupancy</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probability_per_pixel</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.000001</span><span class="p">,</span> <span class="s1">&#39;All probabilities must sum to 1&#39;</span>
+            <span class="n">p_positive</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">P</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p_positive</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span>
+
+            <span class="n">mu</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_positive</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="n">I</span>
+            <span class="n">fq_numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
+            <span class="n">alpha_q_numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p_positive</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dq</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p_positive</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p_positive</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">q</span><span class="p">)</span>
+
+            <span class="n">counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dq</span><span class="p">)</span>
+            <span class="n">fq_numerators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fq_numerator</span><span class="p">)</span>
+            <span class="n">alpha_q_numerators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha_q_numerator</span><span class="p">)</span>
+
+        <span class="c1"># Fit D(q) - the successive log(sizes) with log (counts)</span>
+        <span class="n">dq_slope</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">r_value</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">epsilons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+        <span class="n">dq_r2</span> <span class="o">=</span> <span class="n">r_value</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="c1"># Fit f(q)</span>
+        <span class="n">fq_slope</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">epsilons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fq_numerators</span><span class="p">))</span>
+        <span class="c1"># Fit alpha(q)</span>
+        <span class="n">alphaq_slope</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">epsilons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alpha_q_numerators</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">dq_slope</span><span class="p">,</span> <span class="n">dq_r2</span><span class="p">,</span> <span class="n">fq_slope</span><span class="p">,</span> <span class="n">alphaq_slope</span></div>
+
+<div class="viewcode-block" id="MultifractalVBMs.get_q_fractals"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs.get_q_fractals">[docs]</a>    <span class="k">def</span> <span class="nf">get_q_fractals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">rotations</span><span class="p">,</span> <span class="n">dim_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Calculates all multi-fractal dimensions specified in dim_list for rotation number of times.</span>
+
+<span class="sd">            :param ndarray image: (N,N) binary numpy array image.</span>
+<span class="sd">            :param int rotations: number of rotations performed on the given image from which the optimal run will be chosen.</span>
+<span class="sd">            :param dim_list: Iterable of dimensions to calculate from image.</span>
+<span class="sd">            :returns: The output of &#39;get_multi_fractal_dimension&#39; for every rotation and q dimension.</span>
+<span class="sd">            :rtype: ndarray with size (rotations, len(dim_list), 4).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="n">rotations</span><span class="p">)</span>
+
+        <span class="n">dqs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">:</span>
+            <span class="n">rotated_image</span> <span class="o">=</span> <span class="n">sktransform</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">resize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">)</span>
+            <span class="n">dq</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">dim_list</span><span class="p">:</span>
+                <span class="n">dq_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_multi_fractal_dimension</span><span class="p">(</span><span class="n">rotated_image</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+                <span class="n">dq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dq_value</span><span class="p">)</span>
+
+            <span class="n">dqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dq</span><span class="p">)</span>
+
+        <span class="n">dqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dqs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dqs</span></div>
+
+<div class="viewcode-block" id="MultifractalVBMs.custom_add_reduceat"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs.custom_add_reduceat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">custom_add_reduceat</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Custom numpy.add.reduceat function, twice as fast in the context of binary images.</span>
+<span class="sd">            Sum a 2d-image along a given axis, in the intervals specified by &#39;idx&#39;.</span>
+
+<span class="sd">            :param ndarray image: (N,N) numpy array.</span>
+<span class="sd">            :param ndarray idx: indices along the axis between which the function should sum the values.</span>
+<span class="sd">            :param int axis: Specifies the dimension of im on which to operate. Must be {0, 1}.</span>
+<span class="sd">            :returns: Aggregated image along the given axis.</span>
+<span class="sd">            :rtype: ndarray with size (idx.shape[0], N) for axis=0 or (N, idx.shape[0]) for axis=1.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">idxs_ext</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]])))</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">idxs_ext</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">idxs_ext</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">results</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:,</span> <span class="n">idxs_ext</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span><span class="n">idxs_ext</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Axis must be 0 or 1.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+    <span class="k">def</span> <span class="nf">_probability_per_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">occupancy</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Creates a grid with size k on the image and calculates the occupancy probability for every such box.</span>
+<span class="sd">            Filters the boxes to be between occupancy[0] &lt;= pixel &lt;= occupancy[1]</span>
+
+<span class="sd">            :param ndarray image: (N,N) numpy binary array.</span>
+<span class="sd">            :param int k: Grid box size.</span>
+<span class="sd">            :param list[float] occupancy: a list containing the [min_proba, max_proba]. Boxes with probability</span>
+<span class="sd">                                          smaller than min_proba and larger than max_proba will be ignored.</span>
+<span class="sd">            :returns: A probability grid calculated from image with box size k.</span>
+<span class="sd">            :rtype: ndarray with size (math.ceil(N/k), math.ceil(N/k)).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># split image to boxes sized k by two steps: first sum along vertical axis and then along horizontal.</span>
+        <span class="n">vertical_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_add_reduceat</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">k</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">horizontal_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_add_reduceat</span><span class="p">(</span><span class="n">vertical_sum</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">horizontal_sum</span>
+
+        <span class="c1"># calculate probability per box</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">M</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># filter by box occupancy</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;=</span> <span class="n">occupancy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;=</span> <span class="n">occupancy</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="n">condition</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">condition</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">P</span>
+
+    <span class="k">def</span> <span class="nf">_optimize_dqs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dqs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Finds the best sampling index among all rotations:</span>
+<span class="sd">                a sample which satisfies D0&gt;D1&gt;D2 where D0 is the largest.</span>
+<span class="sd">                if no sampling satisfies D0&gt;D1&gt;D2 returns the sampling index with largest D0.</span>
+
+<span class="sd">            :param ndarray dqs: ndarray with dqs.shape = (rand_rotations, 3) with the values of D0,D1,D2 for every rotation.</span>
+<span class="sd">            :returns: Finds the best sampling index among all rotations.</span>
+<span class="sd">            :rtype: int</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">index1</span> <span class="o">=</span> <span class="p">(</span><span class="n">dqs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">dqs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">index2</span> <span class="o">=</span> <span class="p">(</span><span class="n">dqs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dqs</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="n">comb_ind</span> <span class="o">=</span> <span class="n">index1</span> <span class="o">*</span> <span class="n">index2</span>
+        <span class="n">full_indx_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dqs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">dqs_subset</span> <span class="o">=</span> <span class="n">dqs</span><span class="p">[</span><span class="n">comb_ind</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">subset_index_arr</span> <span class="o">=</span> <span class="n">full_indx_arr</span><span class="p">[</span><span class="n">comb_ind</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">subset_index_arr</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">subset_max_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dqs_subset</span><span class="p">)</span>
+            <span class="n">global_max_index</span> <span class="o">=</span> <span class="n">subset_index_arr</span><span class="p">[</span><span class="n">subset_max_index</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">global_max_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dqs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">global_max_index</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, JF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

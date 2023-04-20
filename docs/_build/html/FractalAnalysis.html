@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FractalAnalysis Module &mdash; PVBM 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="PVBM Tutorial" href="pvbmtutorial.html" />
+    <link rel="prev" title="GeometricalAnalysis Module" href="GeometricalAnalysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PVBM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="GeometricalAnalysis.html">GeometricalAnalysis Module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FractalAnalysis Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#PVBM.FractalAnalysis.MultifractalVBMs"><code class="docutils literal notranslate"><span class="pre">MultifractalVBMs</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#PVBM.FractalAnalysis.MultifractalVBMs.custom_add_reduceat"><code class="docutils literal notranslate"><span class="pre">MultifractalVBMs.custom_add_reduceat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_fundus_biomarkers"><code class="docutils literal notranslate"><span class="pre">MultifractalVBMs.get_fundus_biomarkers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_multi_fractal_dimension"><code class="docutils literal notranslate"><span class="pre">MultifractalVBMs.get_multi_fractal_dimension()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_q_fractals"><code class="docutils literal notranslate"><span class="pre">MultifractalVBMs.get_q_fractals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_singularity_length"><code class="docutils literal notranslate"><span class="pre">MultifractalVBMs.get_singularity_length()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pvbmtutorial.html">PVBM Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PVBM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">FractalAnalysis Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/FractalAnalysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PVBM.FractalAnalysis">
+<span id="fractalanalysis-module"></span><h1>FractalAnalysis Module<a class="headerlink" href="#module-PVBM.FractalAnalysis" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="PVBM.FractalAnalysis.MultifractalVBMs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PVBM.FractalAnalysis.</span></span><span class="sig-name descname"><span class="pre">MultifractalVBMs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_proba</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxproba</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/FractalAnalysis.html#MultifractalVBMs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.FractalAnalysis.MultifractalVBMs" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>A class which holds all required parameters and all the methods to perform</dt><dd><p>multifractal calculation on binary images.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_dim</strong> (<em>int</em>) – maximum dimension used to calculate Singularity Length.</p></li>
+<li><p><strong>n_rotations</strong> (<em>int</em>) – number of rotations performed on the given image from which the optimal run will be chosen.</p></li>
+<li><p><strong>optimize</strong> (<em>bool</em>) – if True - an optimal run will be chosen from n_rotations runs, otherwise only 1 angle will be used.</p></li>
+<li><p><strong>min_proba</strong> (<em>float</em>) – a minimum probability for the occupancy of calculated boxes.
+Boxes with smaller probability will be ignored.</p></li>
+<li><p><strong>max_proba</strong> (<em>float</em>) – a maximum probability for the occupancy of calculated boxes.
+Boxes with higher probability will be ignored.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>tar = ‘example_arteries_586_LES_AV.png’
+sample_arteries_image = skio.imread(tar)
+f_multi = FundusMultifractal()
+out1 = f_multi.get_fundus_biomarkers(sample_arteries_image)
+print(out1)</p>
+<p>tar = ‘sierpinski.png’
+example_monofractal_im = skio.imread(tar) / 255
+f_multi = FundusMultifractal(n_rotations=10)
+out2 = f_multi.get_fundus_biomarkers(example_monofractal_im)
+print(out2)</p>
+<p>tar = ‘binhen.tif’
+example_multifractal_im = skio.imread(tar)/255
+f_multi = FundusMultifractal(n_rotations=4)
+out3 = f_multi.get_fundus_biomarkers(example_multifractal_im)
+print(out3)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PVBM.FractalAnalysis.MultifractalVBMs.custom_add_reduceat">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">custom_add_reduceat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/FractalAnalysis.html#MultifractalVBMs.custom_add_reduceat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.FractalAnalysis.MultifractalVBMs.custom_add_reduceat" title="Permalink to this definition"></a></dt>
+<dd><p>Custom numpy.add.reduceat function, twice as fast in the context of binary images.
+Sum a 2d-image along a given axis, in the intervals specified by ‘idx’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>ndarray</em>) – (N,N) numpy array.</p></li>
+<li><p><strong>idx</strong> (<em>ndarray</em>) – indices along the axis between which the function should sum the values.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Specifies the dimension of im on which to operate. Must be {0, 1}.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Aggregated image along the given axis.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray with size (idx.shape[0], N) for axis=0 or (N, idx.shape[0]) for axis=1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PVBM.FractalAnalysis.MultifractalVBMs.get_fundus_biomarkers">
+<span class="sig-name descname"><span class="pre">get_fundus_biomarkers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/FractalAnalysis.html#MultifractalVBMs.get_fundus_biomarkers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_fundus_biomarkers" title="Permalink to this definition"></a></dt>
+<dd><p>This method will be used to calculate the following dimensions: (D0, D1, D2, singularity length).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> (<em>int</em>) – (N,N) binary numpy array image.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A numpy array containing the [D0, D1, D2, Singularity Length] features.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PVBM.FractalAnalysis.MultifractalVBMs.get_multi_fractal_dimension">
+<span class="sig-name descname"><span class="pre">get_multi_fractal_dimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/FractalAnalysis.html#MultifractalVBMs.get_multi_fractal_dimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_multi_fractal_dimension" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates Q dimension from the given binary image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>ndarray</em>) – (N,N) binary numpy array image.</p></li>
+<li><p><strong>q</strong> (<em>float</em>) – q power of multi-fractal D_q which will be calculated from image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>4-tuple of Multi-fractal calculations:
+* Dq_slope - D_q value for given q.
+* dq_r2 - R^2 of the fit of D_q.
+* fq_slope - f(q) value for given q.
+* alphaq_slope - lpha(q) value for given q.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PVBM.FractalAnalysis.MultifractalVBMs.get_q_fractals">
+<span class="sig-name descname"><span class="pre">get_q_fractals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/FractalAnalysis.html#MultifractalVBMs.get_q_fractals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_q_fractals" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates all multi-fractal dimensions specified in dim_list for rotation number of times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>ndarray</em>) – (N,N) binary numpy array image.</p></li>
+<li><p><strong>rotations</strong> (<em>int</em>) – number of rotations performed on the given image from which the optimal run will be chosen.</p></li>
+<li><p><strong>dim_list</strong> – Iterable of dimensions to calculate from image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The output of ‘get_multi_fractal_dimension’ for every rotation and q dimension.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray with size (rotations, len(dim_list), 4).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PVBM.FractalAnalysis.MultifractalVBMs.get_singularity_length">
+<span class="sig-name descname"><span class="pre">get_singularity_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/FractalAnalysis.html#MultifractalVBMs.get_singularity_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.FractalAnalysis.MultifractalVBMs.get_singularity_length" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates singularity length from f(alpha) singularity curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>alpha</strong> (<em>int</em>) – 1D numpy array containing f(alpha) singularity curve values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Singularity length of this f(alpha) curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="GeometricalAnalysis.html" class="btn btn-neutral float-left" title="GeometricalAnalysis Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pvbmtutorial.html" class="btn btn-neutral float-right" title="PVBM Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, JF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
