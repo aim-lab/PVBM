@@ -1,4 +1,4 @@
 GeometricalAnalysis Module
 ==========================
-.. automodule:: subdirectory.GeometricalAnalysis
+.. automodule:: PVBM.GeometricalAnalysis
    :members:
