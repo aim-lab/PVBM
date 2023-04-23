@@ -12,5 +12,7 @@ Available on pip, with the command: pip install pvbm
 
 pip project: https://pypi.org/project/pvbm/
 
+Read the docs: https://pvbm.readthedocs.io/en/latest/
+
 All the requirements are installed when the toolbox is installed, no need for additional commands.
 
