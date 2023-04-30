@@ -11,7 +11,9 @@ Installation
 Available on pip, with the command: pip install pvbm
 
 pip project: https://pypi.org/project/pvbm/
+
 read the docs: https://pvbm.readthedocs.io/en/latest/
+
 github: https://github.com/aim-lab/PVBM
 
 
