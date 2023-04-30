@@ -94,8 +94,8 @@
 <h1>PVBM Tutorial<a class="headerlink" href="#PVBM-Tutorial" title="Permalink to this heading"></a></h1>
 <section id="Import-the-libraries">
 <h2>Import the libraries<a class="headerlink" href="#Import-the-libraries" title="Permalink to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
@@ -103,17 +103,8 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre></div></div>
-</div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from PIL import Image,ImageFilter #Import Pillow library to load the images
@@ -127,7 +118,7 @@ from skimage.morphology import skeletonize,square,dilation #Import functions to 
 <section id="Download-the-example-images">
 <h2>Download the example images<a class="headerlink" href="#Download-the-example-images" title="Permalink to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>image1 = &quot;117-793-749-000036_RR_43001_04734_F_48.png&quot;
@@ -136,7 +127,7 @@ image2 = &quot;121-691-760-V721942_RR_63739_04251_M_74.png&quot;
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import os
@@ -151,32 +142,32 @@ os.system(&#39;wget -P images https://raw.githubusercontent.com/aim-lab/PVBM/mai
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
---2023-04-30 14:24:18--  https://raw.githubusercontent.com/aim-lab/PVBM/main/117-793-749-000036_RR_43001_04734_F_48.png
-Résolution de raw.githubusercontent.com (raw.githubusercontent.com)… 185.199.111.133, 185.199.110.133, 185.199.109.133, ...
-Connexion à raw.githubusercontent.com (raw.githubusercontent.com)|185.199.111.133|:443… connecté.
+--2023-04-30 15:23:24--  https://raw.githubusercontent.com/aim-lab/PVBM/main/images/117-793-749-000036_RR_43001_04734_F_48.png
+Résolution de raw.githubusercontent.com (raw.githubusercontent.com)… 185.199.110.133, 185.199.109.133, 185.199.111.133, ...
+Connexion à raw.githubusercontent.com (raw.githubusercontent.com)|185.199.110.133|:443… connecté.
 requête HTTP transmise, en attente de la réponse… 200 OK
 Taille : 16773 (16K) [image/png]
 Sauvegarde en : « images/117-793-749-000036_RR_43001_04734_F_48.png.1 »
 
-     0K .......... ......                                     100%  163K=0,1s
+     0K .......... ......                                     100% 16,1M=0,001s
 
-2023-04-30 14:24:19 (163 KB/s) — « images/117-793-749-000036_RR_43001_04734_F_48.png.1 » sauvegardé [16773/16773]
+2023-04-30 15:23:24 (16,1 MB/s) — « images/117-793-749-000036_RR_43001_04734_F_48.png.1 » sauvegardé [16773/16773]
 
---2023-04-30 14:24:19--  https://raw.githubusercontent.com/aim-lab/PVBM/main/121-691-760-V721942_RR_63739_04251_M_74.png
-Résolution de raw.githubusercontent.com (raw.githubusercontent.com)… 185.199.110.133, 185.199.109.133, 185.199.108.133, ...
-Connexion à raw.githubusercontent.com (raw.githubusercontent.com)|185.199.110.133|:443… connecté.
+--2023-04-30 15:23:24--  https://raw.githubusercontent.com/aim-lab/PVBM/main/images/121-691-760-V721942_RR_63739_04251_M_74.png
+Résolution de raw.githubusercontent.com (raw.githubusercontent.com)… 185.199.109.133, 185.199.111.133, 185.199.108.133, ...
+Connexion à raw.githubusercontent.com (raw.githubusercontent.com)|185.199.109.133|:443… connecté.
 requête HTTP transmise, en attente de la réponse… 200 OK
 Taille : 21363 (21K) [image/png]
 Sauvegarde en : « images/121-691-760-V721942_RR_63739_04251_M_74.png.1 »
 
-     0K .......... ..........                                 100% 24,5M=0,001s
+     0K .......... ..........                                 100% 1,78M=0,01s
 
-2023-04-30 14:24:20 (24,5 MB/s) — « images/121-691-760-V721942_RR_63739_04251_M_74.png.1 » sauvegardé [21363/21363]
+2023-04-30 15:23:25 (1,78 MB/s) — « images/121-691-760-V721942_RR_63739_04251_M_74.png.1 » sauvegardé [21363/21363]
 
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -188,7 +179,7 @@ Sauvegarde en : « images/121-691-760-V721942_RR_63739_04251_M_74.png.1 »
 <section id="Load-an-image">
 <h2>Load an image<a class="headerlink" href="#Load-an-image" title="Permalink to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>segmentation_path = &quot;images/&quot;+image1 #replace image1 by image2 if you want to use the second example
@@ -196,7 +187,7 @@ Sauvegarde en : « images/121-691-760-V721942_RR_63739_04251_M_74.png.1 »
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>segmentation = Image.open(segmentation_path) #Open the segmentation
@@ -204,7 +195,7 @@ Sauvegarde en : « images/121-691-760-V721942_RR_63739_04251_M_74.png.1 »
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation,cmap = &quot;gray&quot;) #Display the segmentation
@@ -221,7 +212,7 @@ plt.show()
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Depending on the quality of the segmentation, you would need to regularize (smooth) it more or less
@@ -234,7 +225,7 @@ skeleton = skeletonize(segmentation) # Compute the skeleton of the segmentation
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(skeleton,cmap = &#39;gray&#39;)
@@ -254,7 +245,7 @@ plt.show()
 <section id="Compute-the-area">
 <h2>Compute the area<a class="headerlink" href="#Compute-the-area" title="Permalink to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from PVBM.GeometricalAnalysis import GeometricalVBMs #Import the geometrical analysis module
@@ -263,7 +254,7 @@ geometricalVBMs = GeometricalVBMs() #Instanciate a geometrical VBM object
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>a = geometricalVBMs.area(segmentation)
@@ -283,7 +274,7 @@ The area is 74718.0
 <section id="Compute-the-endpoints-and-intersection-points">
 <h2>Compute the endpoints and intersection points<a class="headerlink" href="#Compute-the-endpoints-and-intersection-points" title="Permalink to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>n_end,n_inter,end,inter = geometricalVBMs.compute_particular_points(skeleton)
@@ -300,7 +291,7 @@ There is 15 endpoints and 49 intersection points
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#Dilation of the endpoints and intersection points for vizualisation
@@ -310,7 +301,7 @@ inter_dilated = dilation(inter, square(15))
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation/10+end_dilated)
@@ -327,7 +318,7 @@ plt.show()
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation/10+inter_dilated)
@@ -344,7 +335,7 @@ plt.show()
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation/10+inter_dilated+end_dilated)
@@ -364,7 +355,7 @@ plt.show()
 <section id="Compute-the-tortuosity-and-the-length">
 <h2>Compute the tortuosity and the length<a class="headerlink" href="#Compute-the-tortuosity-and-the-length" title="Permalink to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>median_tor, length,tor,l,connection_dico = geometricalVBMs.compute_tortuosity_length(skeleton) #times depends in the resolution of the segmentation (smaller is faster)
@@ -372,7 +363,7 @@ plt.show()
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The median tortuosity is {}&quot;.format(median_tor))
@@ -388,7 +379,7 @@ The median tortuosity is 1.076613673789134
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;Here is the list containing the arc-chord ratio of every blood vessels (between two particular points) {}.&quot;
@@ -407,7 +398,7 @@ We can recompute the median tortuosity like this : 1.076613673789134
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The length is {}&quot;.format(length))
@@ -423,7 +414,7 @@ The length is 7934.592780435798
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;Here is the list containing the length of every blood vessels (between two particular points) {}.&quot;
@@ -440,7 +431,7 @@ Here is the list containing the length of every blood vessels (between two parti
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plt.figure(figsize=(5,5))
@@ -468,7 +459,7 @@ plt.show()
 <section id="Compute-the-perimeter">
 <h2>Compute the perimeter<a class="headerlink" href="#Compute-the-perimeter" title="Permalink to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>p,border_matrix = geometricalVBMs.compute_perimeter(segmentation.T) #times depends in the resolution of the segmentation (smaller is faster)
@@ -476,7 +467,7 @@ plt.show()
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The perimeter is {}&quot;.format(p))
@@ -492,7 +483,7 @@ The perimeter is 16263.704463579805
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(border_matrix,cmap = &quot;gray&quot;)
@@ -511,38 +502,29 @@ plt.show()
 </section>
 <section id="Branching-angles">
 <h2>Branching angles<a class="headerlink" href="#Branching-angles" title="Permalink to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mean_ba,std_ba,median_ba,angle_dico,centroid = geometricalVBMs.compute_branching_angles(skeleton)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/jonathanfhima/Desktop/PVBMRelease/PVBM/helpers/branching_angle.py:151: RuntimeWarning: invalid value encountered in double_scalars
-  cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-</pre></div></div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mean_ba,std_ba,median_ba
+print(&quot;The mean, std and median branching angles are mean: {}, std: {}, median: {}&quot;.format(mean_ba,std_ba,median_ba))
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(93.68170612379406, 37.730154406140876, 81.38508303417835)
+The mean, std and median branching angles are mean: 93.68170612379406, std: 37.730154406140876, median: 81.38508303417835
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
