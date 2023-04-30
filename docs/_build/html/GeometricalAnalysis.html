@@ -7,6 +7,7 @@
   <title>GeometricalAnalysis &mdash; PVBM 1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -92,7 +93,7 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.area">
 <span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.area" title="Permalink to this definition"></a></dt>
-<dd><p>This function return the overall area of the segmentation.</p>
+<dd><p>This function compute the overall area of the segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation</strong> (<em>array</em>) – The segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
@@ -109,19 +110,28 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles">
 <span class="sig-name descname"><span class="pre">compute_branching_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_branching_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles" title="Permalink to this definition"></a></dt>
-<dd><p>This function return the median branching angle of the segmentation.</p>
+<dd><p>This function compute the mean, std and median branching angle of the segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>array</em>) – The skeleton of the segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
 </dd>
-<dt class="field-even">Returns float tor<span class="colon">:</span></dt>
-<dd class="field-even"><p>The median tortuosity</p>
+<dt class="field-even">Returns float mean_ba<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mean branching angles</p>
 </dd>
-<dt class="field-odd">Returns float l<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The overall length</p>
+<dt class="field-odd">Returns float std_ba<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The std branching angles</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>(int,int)</p>
+<dt class="field-even">Returns float median_ba<span class="colon">:</span></dt>
+<dd class="field-even"><p>The median branching angles</p>
+</dd>
+<dt class="field-odd">Returns dictionary angle_dico<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionnary containing all the branching angles</p>
+</dd>
+<dt class="field-even">Returns NumpyArray centroid<span class="colon">:</span></dt>
+<dd class="field-even"><p>A numpy array containing a visualisation of the computed centroid</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int,int)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -129,7 +139,7 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_particular_points">
 <span class="sig-name descname"><span class="pre">compute_particular_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_particular_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_particular_points" title="Permalink to this definition"></a></dt>
-<dd><p>This function returns the number of endpoints and intersection points of the segmentation.</p>
+<dd><p>This function compute the number of endpoints and intersection points of the segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>np.ndarray</em>) – The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>
@@ -155,7 +165,7 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_perimeter">
 <span class="sig-name descname"><span class="pre">compute_perimeter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_perimeter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_perimeter" title="Permalink to this definition"></a></dt>
-<dd><p>This function return the perimeter and the border of the segmentation.</p>
+<dd><p>This function compute the perimeter and the border of the segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation</strong> (<em>array</em>) – The segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
@@ -175,7 +185,7 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_tortuosity_length">
 <span class="sig-name descname"><span class="pre">compute_tortuosity_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_tortuosity_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_tortuosity_length" title="Permalink to this definition"></a></dt>
-<dd><p>This function return the median tortuosity and the lengh of the segmentation.</p>
+<dd><p>This function compute the median tortuosity and the lengh of the segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>array</em>) – The skeleton of the segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
