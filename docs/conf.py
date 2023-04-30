@@ -28,6 +28,7 @@ source_dir = 'docs'
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+modindex_common_prefix = []
 
 
 

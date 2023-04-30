@@ -1,5 +1,5 @@
-FractalAnalysis Module
-======================
+FractalAnalysis
+===============
 
 .. automodule:: PVBM.FractalAnalysis
    :members:

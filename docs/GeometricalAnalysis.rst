@@ -1,4 +1,5 @@
-GeometricalAnalysis Module
-==========================
+GeometricalAnalysis
+===================
+
 .. automodule:: PVBM.GeometricalAnalysis
    :members:
