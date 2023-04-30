@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pvbm
-Version: 1.4.0
+Version: 1.5.0
 Summary: Python Vasculature Biomarker toolbox
 Home-page: https://github.com/aim-lab/PVBM
 Author: Jonathan Fhima, Yevgeniy Men
@@ -20,7 +20,9 @@ Installation
 Available on pip, with the command: pip install pvbm
 
 pip project: https://pypi.org/project/pvbm/
+
 read the docs: https://pvbm.readthedocs.io/en/latest/
+
 github: https://github.com/aim-lab/PVBM
 
 
