@@ -12,7 +12,7 @@ class GeometricalVBMs:
     """
 
     def area(self,segmentation):
-        """This function return the overall area of the segmentation.
+        """This function compute the overall area of the segmentation.
 
         :param array segmentation: The segmentation is an two-dimensional array (HxW) with binary value (0 or 1).
         :returns: The area of the segmentation
@@ -23,7 +23,7 @@ class GeometricalVBMs:
     
     def compute_particular_points(self,segmentation_skeleton):
         """
-        This function returns the number of endpoints and intersection points of the segmentation.
+        This function compute the number of endpoints and intersection points of the segmentation.
 
         :param np.ndarray segmentation_skeleton: The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).
         :returns int end_points_count: The number of endpoints 
@@ -44,7 +44,7 @@ class GeometricalVBMs:
         return end_points_count, inter_points_count, end_points, inter_points
     
     def compute_tortuosity_length(self,segmentation_skeleton):
-        """This function return the median tortuosity and the lengh of the segmentation.
+        """This function compute the median tortuosity and the lengh of the segmentation.
 
         :param array segmentation_skeleton: The skeleton of the segmentation is an two-dimensional array (HxW) with binary value (0 or 1).
         :returns float median_tor: The median tortuosity
@@ -59,7 +59,7 @@ class GeometricalVBMs:
         return median_tor,length ,tor,l,connection_dico
 
     def compute_perimeter(self,segmentation):
-        """This function return the perimeter and the border of the segmentation.
+        """This function compute the perimeter and the border of the segmentation.
 
             :param array segmentation: The segmentation is an two-dimensional array (HxW) with binary value (0 or 1).
             :returns float perim: The perimeter
@@ -74,11 +74,14 @@ class GeometricalVBMs:
         return perim,segmentation_skeleton.T
     
     def compute_branching_angles(self,segmentation_skeleton):
-        """This function return the median branching angle of the segmentation.
+        """This function compute the mean, std and median branching angle of the segmentation.
 
             :param array segmentation_skeleton: The skeleton of the segmentation is an two-dimensional array (HxW) with binary value (0 or 1).
-            :returns float tor: The median tortuosity
-            :returns float l: The overall length 
+            :returns float mean_ba: The mean branching angles
+            :returns float std_ba: The std branching angles
+            :returns float median_ba: The median branching angles
+            :returns dictionary angle_dico: A dictionnary containing all the branching angles
+            :returns NumpyArray centroid: A numpy array containing a visualisation of the computed centroid
 
             :rtype: (int,int)
         """

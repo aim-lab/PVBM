@@ -147,6 +147,8 @@ def compute_angles_dictionary(skeleton):
                     c = np.array(v2)
                     ba = a - b
                     bc = c - b
+                    if np.isnan(ba).any() or np.isnan(bc).any() or np.isinf(ba).any() or np.isinf(bc).any() or np.linalg.norm(ba) == 0 or np.linalg.norm(bc) == 0:
+                        continue
 
                     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
                     angle = np.arccos(crop(cosine_angle))
