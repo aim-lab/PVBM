@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pvbm
-Version: 1.5.0
+Version: 1.6.0
 Summary: Python Vasculature Biomarker toolbox
 Home-page: https://github.com/aim-lab/PVBM
 Author: Jonathan Fhima, Yevgeniy Men
@@ -9,7 +9,7 @@ Description-Content-Type: text/markdown
 
 # Python Vasculature BioMarker toolbox documentation
 
-Based on the work published by Fhima, Jonathan, Jan Van Eijgen, Ingeborg Stalmans, Yevgeniy Men, Moti Freiman, and Joachim A. Behar. “PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation.” In Computer Vision–ECCV 2022 Workshops: Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part III, pp. 296-312. Cham: Springer Nature Switzerland, 2023 (https://link.springer.com/chapter/10.1007/978-3-031-25066-8_15).
+Official implementation, based on the work published by Fhima, Jonathan, Jan Van Eijgen, Ingeborg Stalmans, Yevgeniy Men, Moti Freiman, and Joachim A. Behar. “PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation.” In Computer Vision–ECCV 2022 Workshops: Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part III, pp. 296-312. Cham: Springer Nature Switzerland, 2023 (https://link.springer.com/chapter/10.1007/978-3-031-25066-8_15).
     
 ## Description
 
@@ -17,7 +17,7 @@ Eleven biomarkers can be engineered, namely: the area, length, perimeter, number
 
 Installation
 
-Available on pip, with the command: pip install pvbm
+Available on pip. Run: "pip install pvbm"
 
 pip project: https://pypi.org/project/pvbm/
 
