@@ -56,11 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#Compute-the-endpoints-and-intersection-points">Compute the endpoints and intersection points</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Compute-the-tortuosity-and-the-length">Compute the tortuosity and the length</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Compute-the-perimeter">Compute the perimeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Branching-angles">Branching angles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#The-centroid-can-also-be-ploted-(independent-for-each-subgraph)">The centroid can also be ploted (independent for each subgraph)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Lets-extract-each-subgraph-and-their-centroid">Lets extract each subgraph and their centroid</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#Branching-angles">Branching angles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Fractal-Analysis">Fractal Analysis</a></li>
 </ul>
 </li>
@@ -561,8 +557,7 @@ plt.show()
 <img alt="_images/pvbmtutorial_36_0.png" src="_images/pvbmtutorial_36_0.png" />
 </div>
 </div>
-<section id="The-centroid-can-also-be-ploted-(independent-for-each-subgraph)">
-<h3>The centroid can also be ploted (independent for each subgraph)<a class="headerlink" href="#The-centroid-can-also-be-ploted-(independent-for-each-subgraph)" title="Permalink to this heading"></a></h3>
+<p>The centroid can also be ploted (independent for each subgraph)</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
 </pre></div>
@@ -580,9 +575,7 @@ plt.show()
 <img alt="_images/pvbmtutorial_38_0.png" src="_images/pvbmtutorial_38_0.png" />
 </div>
 </div>
-</section>
-<section id="Lets-extract-each-subgraph-and-their-centroid">
-<h3>Lets extract each subgraph and their centroid<a class="headerlink" href="#Lets-extract-each-subgraph-and-their-centroid" title="Permalink to this heading"></a></h3>
+<p>Lets extract each subgraph and their centroid</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
 </pre></div>
@@ -685,7 +678,6 @@ plt.show()
 </div>
 </div>
 </section>
-</section>
 <section id="Fractal-Analysis">
 <h2>Fractal Analysis<a class="headerlink" href="#Fractal-Analysis" title="Permalink to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
@@ -701,7 +693,7 @@ fractalVBMs = MultifractalVBMs(n_rotations = 25,optimize = True, min_proba = 0.0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>D0,D1,D2,SL = fractalVBMs.get_fundus_biomarkers(segmentation)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>D0,D1,D2,SL = fractalVBMs.compute_multifractals(segmentation)
 </pre></div>
 </div>
 </div>

@@ -92,7 +92,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.area">
 <span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.area" title="Permalink to this definition"></a></dt>
-<dd><p>This function computes the area of the blood vessels calculated as the total number of pixels in the segmentation,
+<dd><p>Computes the area of the blood vessels calculated as the total number of pixels in the segmentation,
 and is expressed in pixels^2 (squared pixels).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -110,7 +110,7 @@ and is expressed in pixels^2 (squared pixels).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles">
 <span class="sig-name descname"><span class="pre">compute_branching_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_branching_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles" title="Permalink to this definition"></a></dt>
-<dd><p>This function computes the mean, standard deviation, and median branching angle of the fundus image vasculature segmentation.</p>
+<dd><p>Computes the mean, standard deviation, and median branching angle of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>np.ndarray</em>) – The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>
@@ -158,7 +158,7 @@ This function computes the number of endpoints and intersection points of the fu
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_perimeter">
 <span class="sig-name descname"><span class="pre">compute_perimeter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_perimeter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_perimeter" title="Permalink to this definition"></a></dt>
-<dd><p>This function computes the perimeter and the border of the fundus image vasculature segmentation.</p>
+<dd><p>Computes the perimeter and the border of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation</strong> (<em>np.ndarray</em>) – The segmentation is a two-dimensional array (HxW) with binary value (0 or 1).</p>
@@ -179,7 +179,7 @@ This function computes the number of endpoints and intersection points of the fu
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_tortuosity_length">
 <span class="sig-name descname"><span class="pre">compute_tortuosity_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_tortuosity_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_tortuosity_length" title="Permalink to this definition"></a></dt>
-<dd><p>This function computes the median tortuosity and the length of the fundus image vasculature segmentation.</p>
+<dd><p>Computes the median tortuosity and the length of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>np.ndarray</em>) – The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>

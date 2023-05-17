@@ -123,9 +123,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">optimize</span> <span class="o">=</span> <span class="n">optimize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">box_occupancy_proba</span> <span class="o">=</span> <span class="p">[</span><span class="n">min_proba</span><span class="p">,</span> <span class="n">maxproba</span><span class="p">]</span>
 
-<div class="viewcode-block" id="MultifractalVBMs.get_fundus_biomarkers"><a class="viewcode-back" href="../../FractalAnalysis.html#PVBM.FractalAnalysis.MultifractalVBMs.get_fundus_biomarkers">[docs]</a>    <span class="k">def</span> <span class="nf">get_fundus_biomarkers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segmentation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compute_multifractals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segmentation</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method is used to compute the multifractal biomarkers of a given retinal vasculature segmentation, specifically the dimensions D0, D1, D2, and the singularity length.</span>
+<span class="sd">        Computes the multifractal biomarkers of a given retinal vasculature segmentation, specifically the dimensions D0, D1, D2, and the singularity length.</span>
 
 <span class="sd">        :param segmentation: An (N,N) binary numpy array representing the segmentation to be analyzed.</span>
 <span class="sd">        :type segmentation: np.ndarray</span>
@@ -148,7 +148,7 @@
 
         <span class="n">sing_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_singularity_length</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">image_stats_opt</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">3</span><span class="p">])</span>
         <span class="n">three_dqs</span> <span class="o">=</span> <span class="n">image_stats_opt</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">three_dqs</span><span class="p">,</span> <span class="n">sing_features</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">three_dqs</span><span class="p">,</span> <span class="n">sing_features</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">get_singularity_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>

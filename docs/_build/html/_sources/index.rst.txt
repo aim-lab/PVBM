@@ -37,7 +37,7 @@ Eleven biomarkers have been engineered independently on the arterioles and venul
 
 * Correlation Dimension: D2 (also known as the correlation dimension) is a measure of the correlation of the pattern.
 
-* Singularity Length: SL (Singularity length) represents the range of fluctuation in the fractal dimension, providing information about the complexity of local variations in the image.
+* Singularity Length: SL represents the range of fluctuation in the fractal dimension, providing information about the complexity of local variations in the image.
 
 
 
