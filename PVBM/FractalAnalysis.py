@@ -50,9 +50,9 @@ class MultifractalVBMs:
         self.optimize = optimize
         self.box_occupancy_proba = [min_proba, maxproba]
 
-    def get_fundus_biomarkers(self, segmentation):
+    def compute_multifractals(self, segmentation):
         '''
-        This method is used to compute the multifractal biomarkers of a given retinal vasculature segmentation, specifically the dimensions D0, D1, D2, and the singularity length.
+        Computes the multifractal biomarkers of a given retinal vasculature segmentation, specifically the dimensions D0, D1, D2, and the singularity length.
 
         :param segmentation: An (N,N) binary numpy array representing the segmentation to be analyzed.
         :type segmentation: np.ndarray

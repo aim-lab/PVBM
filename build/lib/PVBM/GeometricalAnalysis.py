@@ -12,7 +12,7 @@ class GeometricalVBMs:
 
     def area(self,segmentation):
         """
-    This function computes the area of the blood vessels calculated as the total number of pixels in the segmentation, 
+    Computes the area of the blood vessels calculated as the total number of pixels in the segmentation,
     and is expressed in pixels^2 (squared pixels).
 
     :param segmentation: The segmentation is a two-dimensional array (HxW) with binary values (0 or 1).
@@ -50,7 +50,7 @@ class GeometricalVBMs:
     
     def compute_tortuosity_length(self,segmentation_skeleton):
         """
-    This function computes the median tortuosity and the length of the fundus image vasculature segmentation.
+    Computes the median tortuosity and the length of the fundus image vasculature segmentation.
     
     :param segmentation_skeleton: The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).
     :type segmentation_skeleton: np.ndarray
@@ -68,7 +68,7 @@ class GeometricalVBMs:
 
     def compute_perimeter(self,segmentation):
         """
-    This function computes the perimeter and the border of the fundus image vasculature segmentation.
+    Computes the perimeter and the border of the fundus image vasculature segmentation.
 
     :param segmentation: The segmentation is a two-dimensional array (HxW) with binary value (0 or 1).
     :type segmentation: np.ndarray
@@ -87,7 +87,7 @@ class GeometricalVBMs:
     
     def compute_branching_angles(self,segmentation_skeleton):
         """
-    This function computes the mean, standard deviation, and median branching angle of the fundus image vasculature segmentation.
+    Computes the mean, standard deviation, and median branching angle of the fundus image vasculature segmentation.
 
     :param segmentation_skeleton: The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).
     :type segmentation_skeleton: np.ndarray

@@ -11,6 +11,8 @@ from skimage.morphology import (erosion, dilation, closing, opening,
 from PVBM.helpers.branching2 import compute_tortuosity
 
 from scipy.signal import convolve2d
+from queue import PriorityQueue
+
 filter_ = np.ones((3,3))
 filter_[1,1] = 10
 filter_
@@ -27,64 +29,21 @@ def preprocess(skeleton):
                 origin_points.append((i,j))
     return origin_points
 
-def recursive(i,j,skeleton,origin_points,visited,dist,distance_dictionnary):
-    up = (i-1,j)
-    down = (i+1,j)
-    left = (i,j-1)
-    right = (i,j+1)
-    
-    up_left = (i-1,j-1)
-    up_right = (i-1,j+1)
-    down_left = (i+1,j-1)
-    down_right = (i+1,j+1)
-    
-    if up[0] >=0 and up and visited[up] ==0:
-        visited[up] = 1
-        if skeleton[up[0]][up[1]] ==1:    
-            distance_dictionnary[(up[0],up[1])] = max(distance_dictionnary[up[0],up[1]],dist +1)
-            recursive(up[0],up[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-            
-    if down[0] < len(skeleton) and visited[down] ==0:
-        visited[down] = 1
-        if skeleton[down[0]][down[1]] ==1:
-            distance_dictionnary[(down[0],down[1])] = max(distance_dictionnary[down[0],down[1]],dist +1)
-            recursive(down[0],down[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-    
-    if left[1] >= 0 and visited[left] ==0:
-        visited[left] = 1
-        if skeleton[left[0]][left[1]] ==1: 
-            distance_dictionnary[(left[0],left[1])] = max(distance_dictionnary[left[0],left[1]],dist +1)
-            recursive(left[0],left[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-            
-    if right[1] <len(skeleton[0]) and visited[right] ==0:
-        visited[right] = 1
-        if skeleton[right[0]][right[1]] ==1: 
-            distance_dictionnary[(right[0],right[1])] = max(distance_dictionnary[right[0],right[1]],dist +1)
-            recursive(right[0],right[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-                
-    if up_left[0] >=0 and up_left[1] >=0 and visited[up_left] ==0:
-        visited[up_left] = 1
-        if skeleton[up_left[0]][up_left[1]] ==1: 
-            distance_dictionnary[(up_left[0],up_left[1])] = max(distance_dictionnary[up_left[0],up_left[1]],dist +1)
-            recursive(up_left[0],up_left[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-                     
-    if up_right[0] >=0 and up_right[1] < len(skeleton) and visited[up_right] ==0:
-        visited[up_right] = 1
-        if skeleton[up_right[0]][up_right[1]] ==1: 
-            distance_dictionnary[(up_right[0],up_right[1])] = max(distance_dictionnary[up_right[0],up_right[1]],dist +1)
-            recursive(up_right[0],up_right[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-             
-    if down_left[0] < len(skeleton) and down_left[1] >=0 and visited[down_left] ==0:
-        visited[down_left] = 1
-        if skeleton[down_left[0]][down_left[1]] ==1: 
-            distance_dictionnary[(down_left[0],down_left[1])] = max(distance_dictionnary[down_left[0],down_left[1]],dist +1)
-            recursive(down_left[0],down_left[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
-                
-    if down_right[0] < len(skeleton) and down_right[1] >=0 and visited[down_right] ==0:
-        visited[down_right] = 1
-        if skeleton[down_right[0]][down_right[1]] ==1: 
-            distance_dictionnary[(down_right[0],down_right[1])] = max(distance_dictionnary[down_right[0],down_right[1]],dist +1)
-            recursive(down_right[0],down_right[1],skeleton,origin_points,visited,dist+1,distance_dictionnary)
+def iterative(i,j,skeleton,origin_points,visited,dist,distance_dictionnary):
+    pq = PriorityQueue()
+    pq.put((0, i, j, i, j,0))
+    priotities = [0,1,2,3,4,5,6,7]
+    while not pq.empty():
+        _, i_or, j_or, i, j,dist = pq.get()
+        directions = [(i-1,j),(i+1,j),(i,j-1),(i,j+1),(i-1,j-1),(i-1,j+1),(i+1,j-1),(i+1,j+1)]
+        for direction,priority in zip(directions,priotities):
+          x,y = direction
+          if x >= 0 and x < skeleton.shape[0] and y >= 0 and y < skeleton.shape[1] and visited[direction] == 0:
+            visited[direction] = 1
+            if skeleton[x][y] == 1:
+              point = direction
+              distance_dictionnary[(point[0],point[1])] = max(distance_dictionnary[point[0],point[1]],dist +1)
+              pq.put((priority, i_or, j_or, x, y,dist+1))
                 
 
 def distance(skeleton,origin_points):
@@ -94,7 +53,7 @@ def distance(skeleton,origin_points):
             if visited[i,j] == 0:
                 visited[i,j] = 1
             if skeleton[i][j] ==1 and (i,j) in origin_points :
-                recursive(i,j,skeleton,origin_points,visited,0,distance_dictionnary)
+                iterative(i,j,skeleton,origin_points,visited,0,distance_dictionnary)
     return distance_dictionnary
 
 def compute_distances(skeleton,origin_points):
