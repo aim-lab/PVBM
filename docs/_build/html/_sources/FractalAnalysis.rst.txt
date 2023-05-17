@@ -6,4 +6,4 @@ FractalAnalysis
 .. autoclass:: MultifractalVBMs
    :members: None
 
-   .. automethod:: get_fundus_biomarkers
+   .. automethod:: compute_multifractals
