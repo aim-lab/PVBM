@@ -22,6 +22,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     "nbsphinx",
+    'sphinx.ext.mathjax',
 ]
 source_dir = 'docs'
 

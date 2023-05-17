@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PVBM documentation! &mdash; PVBM 1.0 documentation</title>
+  <title>Python Vasculature BioMarker Toolbox &mdash; PVBM 1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -16,6 +16,8 @@
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -62,7 +64,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">PVBM documentation!</li>
+      <li class="breadcrumb-item active">Python Vasculature BioMarker Toolbox</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -72,19 +74,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pvbm-documentation">
-<h1>PVBM documentation!<a class="headerlink" href="#pvbm-documentation" title="Permalink to this heading"></a></h1>
-<p>Python Vasculature BioMarker Toolbox.</p>
-<p>Official implementation, based on the work published by Fhima, Jonathan, Jan Van Eijgen, Ingeborg Stalmans, Yevgeniy Men, Moti Freiman, and Joachim A. Behar. “PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation.” In Computer Vision–ECCV 2022 Workshops: Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part III, pp. 296-312. Cham: Springer Nature Switzerland, 2023 (<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-25066-8_15">https://link.springer.com/chapter/10.1007/978-3-031-25066-8_15</a>).</p>
+  <section id="python-vasculature-biomarker-toolbox">
+<h1>Python Vasculature BioMarker Toolbox<a class="headerlink" href="#python-vasculature-biomarker-toolbox" title="Permalink to this heading"></a></h1>
 </section>
 <section id="description">
 <h1>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h1>
-<p>Eleven biomarkers can be engineered, namely: the area, length, perimeter, number of endpoints, number of intersection points, median tortuosity, median branching angle, capacity dimension, entropy dimension, correlation dimension and singularity length.</p>
-<p>Installation</p>
+<p>Digital fundus images are specialized photographs of the interior surface of the eye, capturing detailed views of the retina including blood vessels, optic disk and macula. They are invaluable tools in ophthalmology and optometry for diagnosing and monitoring various ocular diseases, including diabetic retinopathy, glaucoma, and macular degeneration.</p>
+<p>The fundus image allows for the visualization of numerous vascular features, notably the arterioles (small arteries) and venules (small veins). Advanced image processing and machine learning techniques now enable the extraction of arterioles and venules from fundus images, a process known as A/V segmentation. By isolating these vessels, we can examine their morphology and distribution in greater detail, revealing subtle changes that might otherwise go unnoticed.</p>
+<p>From this A/V segmentation, we can compute vasculature biomarkers, which are quantifiable indicators of biological states or conditions. By analyzing these vasculature biomarkers, healthcare professionals can gain deeper insights into a patient’s ocular health and potentially detect early signs of disease. This approach represents a promising frontier in eye care, allowing for more proactive and personalized treatment strategies.</p>
+<p>Eleven biomarkers have been engineered independently on the arterioles and venules segmentation, namely:</p>
+<ul class="simple">
+<li><p>Area: This refers to the density of the blood vessels calculated as the total number of pixels in the segmentation, and is expressed in square pixels (<span class="math notranslate nohighlight">\(pixels^2\)</span>).</p></li>
+<li><p>Length: This represents the cumulative length of the blood vessel derived from the segmentation. It is computed as the necessary distance to traverse the entire segmentation and is expressed in pixels.</p></li>
+<li><p>Perimeter: This is the total perimeter of the blood vessel from a segmentation, calculated as the required distance to traverse the outer boundary of the segmentation, and is expressed in pixels.</p></li>
+<li><p>Number of Endpoints: This refers to the count of points in the segmentation that correspond to the termination of a blood vessel.</p></li>
+<li><p>Number of Intersection Points: This is the count of points in the segmentation that correspond to an intersection within a blood vessel.</p></li>
+<li><p>Median Tortuosity: This is the median value of the tortuosity distribution for all blood vessels, computed using the arc-chord ratio.</p></li>
+<li><p>Median Branching Angle: This is the median value of the branching angle distribution for all blood vessels, and it is expressed in degrees (°).</p></li>
+<li><p>Capacity Dimension: D0 (also known as the box-counting dimension) is a measure of the space-filling capacity of the pattern.</p></li>
+<li><p>Entropy Dimension: D1 (also known as the entropy dimension) is a measure of the distribution of the pattern.</p></li>
+<li><p>Correlation Dimension: D2 (also known as the correlation dimension) is a measure of the correlation of the pattern.</p></li>
+<li><p>Singularity Length: SL (Singularity length) represents the range of fluctuation in the fractal dimension, providing information about the complexity of local variations in the image.</p></li>
+</ul>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
 <p>Available on pip. Run: “pip install pvbm”</p>
 <p>pip project: <a class="reference external" href="https://pypi.org/project/pvbm/">https://pypi.org/project/pvbm/</a></p>
 <p>read the docs: <a class="reference external" href="https://pvbm.readthedocs.io/en/latest/">https://pvbm.readthedocs.io/en/latest/</a></p>
 <p>github: <a class="reference external" href="https://github.com/aim-lab/PVBM">https://github.com/aim-lab/PVBM</a></p>
+<p>Official implementation, based on the work published by Fhima, Jonathan, Jan Van Eijgen, Ingeborg Stalmans, Yevgeniy Men, Moti Freiman, and Joachim A. Behar. “PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation.” In Computer Vision–ECCV 2022 Workshops: Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part III, pp. 296-312. Cham: Springer Nature Switzerland, 2023 (<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-25066-8_15">https://link.springer.com/chapter/10.1007/978-3-031-25066-8_15</a>).</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -124,14 +143,6 @@
 </li>
 </ul>
 </div>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </section>
 
 

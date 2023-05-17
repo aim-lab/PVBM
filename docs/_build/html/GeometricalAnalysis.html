@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="FractalAnalysis" href="FractalAnalysis.html" />
-    <link rel="prev" title="PVBM documentation!" href="index.html" /> 
+    <link rel="prev" title="Python Vasculature BioMarker Toolbox" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -88,18 +88,18 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PVBM.GeometricalAnalysis.</span></span><span class="sig-name descname"><span class="pre">GeometricalVBMs</span></span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs" title="Permalink to this definition"></a></dt>
-<dd><p>A class which holds all required methods to perform
-geometrical biomarker computation.</p>
+<dd><p>A class that can perform geometrical biomarker computation for a fundus image.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.area">
 <span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.area" title="Permalink to this definition"></a></dt>
-<dd><p>This function compute the overall area of the segmentation.</p>
+<dd><p>This function computes the area of the blood vessels calculated as the total number of pixels in the segmentation,
+and is expressed in pixels^2 (squared pixels).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>segmentation</strong> (<em>array</em>) – The segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
+<dd class="field-odd"><p><strong>segmentation</strong> (<em>array</em>) – The segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The area of the segmentation</p>
+<dd class="field-even"><p>The area of the segmentation.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -110,28 +110,23 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles">
 <span class="sig-name descname"><span class="pre">compute_branching_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_branching_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles" title="Permalink to this definition"></a></dt>
-<dd><p>This function compute the mean, std and median branching angle of the segmentation.</p>
+<dd><p>This function computes the mean, standard deviation, and median branching angle of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>array</em>) – The skeleton of the segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
+<dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>np.ndarray</em>) – The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>
 </dd>
-<dt class="field-even">Returns float mean_ba<span class="colon">:</span></dt>
-<dd class="field-even"><p>The mean branching angles</p>
-</dd>
-<dt class="field-odd">Returns float std_ba<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The std branching angles</p>
-</dd>
-<dt class="field-even">Returns float median_ba<span class="colon">:</span></dt>
-<dd class="field-even"><p>The median branching angles</p>
-</dd>
-<dt class="field-odd">Returns dictionary angle_dico<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionnary containing all the branching angles</p>
-</dd>
-<dt class="field-even">Returns NumpyArray centroid<span class="colon">:</span></dt>
-<dd class="field-even"><p>A numpy array containing a visualisation of the computed centroid</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The mean of the branching angles (in degrees)</p></li>
+<li><p>The standard deviation of the branching angles (in degrees)</p></li>
+<li><p>The median of the branching angles (in degrees)</p></li>
+<li><p>A dictionary containing all the branching angles with their respective indices in the array as keys</p></li>
+<li><p>A two-dimensional numpy array representing the visualization of the computed centroid of the segmentation skeleton.</p></li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(int,int)</p>
+<dd class="field-odd"><p>(float, float, float, dict, np.ndarray)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -139,25 +134,23 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_particular_points">
 <span class="sig-name descname"><span class="pre">compute_particular_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_particular_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_particular_points" title="Permalink to this definition"></a></dt>
-<dd><p>This function compute the number of endpoints and intersection points of the segmentation.</p>
+<dd><p>The particular point is the union between the endpoints and the intersection points.
+This function computes the number of endpoints and intersection points of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>np.ndarray</em>) – The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>
 </dd>
-<dt class="field-even">Returns int end_points_count<span class="colon">:</span></dt>
-<dd class="field-even"><p>The number of endpoints</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The number of endpoints</p></li>
+<li><p>The number of intersection points,</p></li>
+<li><p>An array with endpoint pixel positions</p></li>
+<li><p>An array with intersection point pixel positions.</p></li>
+</ul>
+</p>
 </dd>
-<dt class="field-odd">Returns int inter_points_count<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The number of intersection points</p>
-</dd>
-<dt class="field-even">Returns np.ndarray end_points<span class="colon">:</span></dt>
-<dd class="field-even"><p>An array where the value at the position (i,j) is True if the pixel is an endpoint, False otherwise</p>
-</dd>
-<dt class="field-odd">Returns np.ndarray inter_points<span class="colon">:</span></dt>
-<dd class="field-odd"><p>An array where the value at the position (i,j) is True if the pixel is an intersection point, False otherwise</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>(int, int, np.ndarray, np.ndarray)</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int, int, np.ndarray, np.ndarray)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -165,19 +158,20 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_perimeter">
 <span class="sig-name descname"><span class="pre">compute_perimeter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_perimeter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_perimeter" title="Permalink to this definition"></a></dt>
-<dd><p>This function compute the perimeter and the border of the segmentation.</p>
+<dd><p>This function computes the perimeter and the border of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>segmentation</strong> (<em>array</em>) – The segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
+<dd class="field-odd"><p><strong>segmentation</strong> (<em>np.ndarray</em>) – The segmentation is a two-dimensional array (HxW) with binary value (0 or 1).</p>
 </dd>
-<dt class="field-even">Returns float perim<span class="colon">:</span></dt>
-<dd class="field-even"><p>The perimeter</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The perimeter (in pixel)</p></li>
+<li><p>A matrix containing the edges of the segmentation.</p></li>
+</ul>
+</p>
 </dd>
-<dt class="field-odd">Returns NumpyArray border<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The matrix containing the edges of the segmentation.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>(float,NumpyArray)</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(float, np.ndarray)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -185,28 +179,23 @@ geometrical biomarker computation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PVBM.GeometricalAnalysis.GeometricalVBMs.compute_tortuosity_length">
 <span class="sig-name descname"><span class="pre">compute_tortuosity_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_skeleton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/PVBM/GeometricalAnalysis.html#GeometricalVBMs.compute_tortuosity_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_tortuosity_length" title="Permalink to this definition"></a></dt>
-<dd><p>This function compute the median tortuosity and the lengh of the segmentation.</p>
+<dd><p>This function computes the median tortuosity and the length of the fundus image vasculature segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>array</em>) – The skeleton of the segmentation is an two-dimensional array (HxW) with binary value (0 or 1).</p>
+<dd class="field-odd"><p><strong>segmentation_skeleton</strong> (<em>np.ndarray</em>) – The skeleton of the segmentation is a two-dimensional array (HxW) with binary values (0 or 1).</p>
 </dd>
-<dt class="field-even">Returns float median_tor<span class="colon">:</span></dt>
-<dd class="field-even"><p>The median tortuosity</p>
-</dd>
-<dt class="field-odd">Returns float length<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The overall normalized length</p>
-</dd>
-<dt class="field-even">Returns list tor<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list containing the arc-chord ratio of every blood vessels (between two particular points).</p>
-</dd>
-<dt class="field-odd">Returns list l<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A list containing the non normalized length of every blood vessels (between two particular points).</p>
-</dd>
-<dt class="field-even">Returns dictionary connection_dico<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionnary containing in key some particular points and in value the list of the particular points connected to him, with their length. This dictionnary was build by navigating through the skeleton.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The median tortuosity</p></li>
+<li><p>The overall length (in pixel)</p></li>
+<li><p>A list of chord distance of each blood vessel (in pixel)</p></li>
+<li><p>A list of lengths distance (arc) of each blood vessel (in pixel)</p></li>
+<li><p>A dictionary with connection information.</p></li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(float,float,List,List,Dictionary)</p>
+<dd class="field-odd"><p>(float, float, list, list, dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -219,7 +208,7 @@ geometrical biomarker computation.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="PVBM documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Python Vasculature BioMarker Toolbox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="FractalAnalysis.html" class="btn btn-neutral float-right" title="FractalAnalysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
