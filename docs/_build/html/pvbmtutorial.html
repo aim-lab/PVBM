@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PVBM Tutorial &mdash; PVBM 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="FractalAnalysis" href="FractalAnalysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PVBM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="GeometricalAnalysis.html">GeometricalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FractalAnalysis.html">FractalAnalysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PVBM Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Import-the-libraries">Import the libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Download-the-example-images">Download the example images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Load-an-image">Load an image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Compute-the-area">Compute the area</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Compute-the-endpoints-and-intersection-points">Compute the endpoints and intersection points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Compute-the-tortuosity-and-the-length">Compute the tortuosity and the length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Compute-the-perimeter">Compute the perimeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Branching-angles">Branching angles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Fractal-Analysis">Fractal Analysis</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PVBM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">PVBM Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pvbmtutorial.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p><a class="reference external" href="https://colab.research.google.com/github/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb"><img alt="Open in Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section id="PVBM-Tutorial">
+<h1>PVBM Tutorial<a class="headerlink" href="#PVBM-Tutorial" title="Permalink to this heading"></a></h1>
+<p>If you are using colab, install the pvbm library by uncommenting the following cell</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#pip install pvbm
+</pre></div>
+</div>
+</div>
+<section id="Import-the-libraries">
+<h2>Import the libraries<a class="headerlink" href="#Import-the-libraries" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from PIL import Image,ImageFilter #Import Pillow library to load the images
+import numpy as np #Import numpy
+import matplotlib.pyplot as plt #Import matplotlib library for visualization
+from skimage.morphology import skeletonize,square,dilation #Import functions to compute morphological operations
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Download-the-example-images">
+<h2>Download the example images<a class="headerlink" href="#Download-the-example-images" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>image1 = &quot;117-793-749-000036_RR_43001_04734_F_48.png&quot;
+image2 = &quot;121-691-760-V721942_RR_63739_04251_M_74.png&quot;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import os
+
+os.system(&#39;wget -P images https://raw.githubusercontent.com/aim-lab/PVBM/main/images/{} &gt; /dev/null 2&gt;&amp;1&#39;.format(image1))
+os.system(&#39;wget -P images https://raw.githubusercontent.com/aim-lab/PVBM/main/images/{} &gt; /dev/null 2&gt;&amp;1&#39;.format(image2))
+print(&quot;Images downloaded successfully&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Images downloaded successfully
+</pre></div></div>
+</div>
+</section>
+<section id="Load-an-image">
+<h2>Load an image<a class="headerlink" href="#Load-an-image" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>segmentation_path = &quot;images/&quot;+image1 #replace image1 by image2 if you want to use the second example
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>segmentation = Image.open(segmentation_path) #Open the segmentation
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation,cmap = &quot;gray&quot;) #Display the segmentation
+plt.title(&quot;Segmentation&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_13_0.png" src="_images/pvbmtutorial_13_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Depending on the quality of the segmentation, you would need to regularize (smooth) it more or less
+#before computing the skeleton for instance by uncomment the following command
+#segmentation = segmentation.filter(ImageFilter.ModeFilter(size=3))
+
+segmentation = np.array(segmentation)/255 #Convert the segmentation to a numpy array with value 0 and 1
+skeleton = skeletonize(segmentation) # Compute the skeleton of the segmentation
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(skeleton,cmap = &#39;gray&#39;)
+plt.title(&quot;Segmentation skeleton&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_15_0.png" src="_images/pvbmtutorial_15_0.png" />
+</div>
+</div>
+</section>
+<section id="Compute-the-area">
+<h2>Compute the area<a class="headerlink" href="#Compute-the-area" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from PVBM.GeometricalAnalysis import GeometricalVBMs #Import the geometrical analysis module
+geometricalVBMs = GeometricalVBMs() #Instanciate a geometrical VBM object
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>a = geometricalVBMs.area(segmentation)
+print(&quot;The area is {}&quot;.format(a))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The area is 74718.0
+</pre></div></div>
+</div>
+</section>
+<section id="Compute-the-endpoints-and-intersection-points">
+<h2>Compute the endpoints and intersection points<a class="headerlink" href="#Compute-the-endpoints-and-intersection-points" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>n_end,n_inter,end,inter = geometricalVBMs.compute_particular_points(skeleton)
+print(&quot;There is {} endpoints and {} intersection points&quot;.format(n_end,n_inter))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+There is 15 endpoints and 49 intersection points
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#Dilation of the endpoints and intersection points for vizualisation
+end_dilated = dilation(end, square(15))
+inter_dilated = dilation(inter, square(15))
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation/10+end_dilated)
+plt.title(&#39;Endpoints&#39;)
+plt.show()
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_22_0.png" src="_images/pvbmtutorial_22_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation/10+inter_dilated)
+plt.title(&quot;Intersection points&quot;)
+plt.show()
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_23_0.png" src="_images/pvbmtutorial_23_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(segmentation/10+inter_dilated+end_dilated)
+plt.title(&quot;Particular points&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_24_0.png" src="_images/pvbmtutorial_24_0.png" />
+</div>
+</div>
+</section>
+<section id="Compute-the-tortuosity-and-the-length">
+<h2>Compute the tortuosity and the length<a class="headerlink" href="#Compute-the-tortuosity-and-the-length" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>median_tor, length,tor,l,connection_dico = geometricalVBMs.compute_tortuosity_length(skeleton) #times depends in the resolution of the segmentation (smaller is faster)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The median tortuosity is {}&quot;.format(median_tor))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The median tortuosity is 1.076613673789134
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;Here is the list containing the arc-chord ratio of every blood vessels (between two particular points) {}.&quot;
+      .format(tor[:3]))
+print(&quot;We can recompute the median tortuosity like this : {}&quot;.format(np.median(tor)))
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Here is the list containing the arc-chord ratio of every blood vessels (between two particular points) [1.0326649560373642, 1.0644018448727424, 1.0737362316643277].
+We can recompute the median tortuosity like this : 1.076613673789134
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The length is {}&quot;.format(length))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The length is 7934.592780435798
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;Here is the list containing the length of every blood vessels (between two particular points) {}.&quot;
+      .format(l[:3]))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Here is the list containing the length of every blood vessels (between two particular points) [2.8284271247461903, 6.242640687119285, 2].
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plt.figure(figsize=(5,5))
+for key,values in connection_dico.items():
+    x1,y1 = key
+    for value in values:
+        x2,y2 = value[0][0],value[0][1]
+        x_ = (x1,x2)
+        y_ = (y1,y2)
+        plt.plot(y_,x_, color=&quot;red&quot;, linewidth=1)
+plt.imshow(segmentation,cmap = &#39;gray&#39;)
+plt.title(&#39;Linear interpolation of the segmentation that was used to compute the length and the tortuosity&#39;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_31_0.png" src="_images/pvbmtutorial_31_0.png" />
+</div>
+</div>
+</section>
+<section id="Compute-the-perimeter">
+<h2>Compute the perimeter<a class="headerlink" href="#Compute-the-perimeter" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>p,border_matrix = geometricalVBMs.compute_perimeter(segmentation.T) #times depends in the resolution of the segmentation (smaller is faster)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The perimeter is {}&quot;.format(p))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The perimeter is 16263.704463579805
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(border_matrix,cmap = &quot;gray&quot;)
+plt.title(&quot;Edge of the segmentation&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_35_0.png" src="_images/pvbmtutorial_35_0.png" />
+</div>
+</div>
+</section>
+<section id="Branching-angles">
+<h2>Branching angles<a class="headerlink" href="#Branching-angles" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mean_ba,std_ba,median_ba,angle_dico,centroid = geometricalVBMs.compute_branching_angles(skeleton)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mean_ba,std_ba,median_ba
+print(&quot;The mean, std and median branching angles are mean: {}, std: {}, median: {}&quot;.format(mean_ba,std_ba,median_ba))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The mean, std and median branching angles are mean: 93.68170612379406, std: 37.730154406140876, median: 81.38508303417835
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plt.figure(figsize=(5,5))
+for points,angle in angle_dico.items():
+    b,a,c = points
+    if True:
+        if angle &gt; 90 :
+            x_ = [b[0],a[0]]
+            y_ = [b[1],a[1]]
+            plt.plot(y_,x_, color=&quot;red&quot;, linewidth=1)
+            x_ = [b[0],c[0]]
+            y_ = [b[1],c[1]]
+            plt.plot(y_,x_, color=&quot;red&quot;, linewidth=1)
+        if angle &lt; 90 :
+            x_ = [b[0],a[0]]
+            y_ = [b[1],a[1]]
+            plt.plot(y_,x_, color=&quot;green&quot;, linewidth=1)
+            x_ = [b[0],c[0]]
+            y_ = [b[1],c[1]]
+            plt.plot(y_,x_, color=&quot;green&quot;, linewidth=1)
+plt.imshow(skeleton,cmap = &#39;gray&#39;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_39_0.png" src="_images/pvbmtutorial_39_0.png" />
+</div>
+</div>
+<p>The centroid can also be ploted (independent for each subgraph)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(dilation(centroid,square(10)))
+plt.title(&quot;Centroid of each subgraph&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_41_0.png" src="_images/pvbmtutorial_41_0.png" />
+</div>
+</div>
+<p>Lets extract each subgraph and their centroid</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>graphs = 1*(centroid != -1)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from queue import PriorityQueue
+def iterative(A, B, i, j, n):
+  pq = PriorityQueue()
+  pq.put((0,A,B,i,j,n))
+  priotities = [0,1,2,3,4,5,6,7]
+  while not pq.empty():
+    _,A, B, i, j, n = pq.get()
+    directions = [(i-1,j),(i+1,j),(i,j-1),(i,j+1),(i-1,j-1),(i-1,j+1),(i+1,j-1),(i+1,j+1)]
+    for direction,priority in zip(directions,priotities):
+      x,y = direction
+      if x &gt;= 0 and x &lt; A.shape[0] and y &gt;= 0 and y &lt; A.shape[1] and A[direction] == 1:
+            B[direction] = n
+            A[direction] = 0
+            pq.put((priority,A,B,direction[0],direction[1],n))
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from tqdm.notebook import tqdm
+def extract_subgraphs(graphs):
+    B = np.zeros_like(graphs)
+    n = 1
+    for i in tqdm(range(graphs.shape[0])):
+        for j in range(graphs.shape[1]):
+            if B[i,j] == 0 and graphs[i,j] == 1:
+                iterative(graphs,B,i,j,n)
+                n+=1
+    return B
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>B = extract_subgraphs(graphs.copy())
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "36eb72bcc156422297ed1b4798cc83ec", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(dilation(B*100,square(10)))
+plt.title(&quot;The subgraphs are in different color&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_47_0.png" src="_images/pvbmtutorial_47_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>for i in range(1,B.max()+1):
+    mask = B == i
+    sub_skeleton = skeleton * mask
+    sub_centroid = centroid * mask
+    sub_centroid_tmp = sub_centroid.copy()
+    sub_centroid_tmp[sub_centroid_tmp == 0 ] = np.inf
+    detected_centroid = sub_centroid_tmp == sub_centroid_tmp.min()
+    plt.imshow(dilation(sub_skeleton,square(10)) + 10*dilation(detected_centroid,square(30)))
+    plt.title(&quot;Centroid of the graph number {}&quot;.format(i))
+    plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/pvbmtutorial_48_0.png" src="_images/pvbmtutorial_48_0.png" />
+</div>
+</div>
+</section>
+<section id="Fractal-Analysis">
+<h2>Fractal Analysis<a class="headerlink" href="#Fractal-Analysis" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from PVBM.FractalAnalysis import MultifractalVBMs
+fractalVBMs = MultifractalVBMs(n_rotations = 25,optimize = True, min_proba = 0.0001, maxproba = 0.9999)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>D0,D1,D2,SL = fractalVBMs.compute_multifractals(segmentation)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;The fractal biomarkers are D0: {}, D1: {}, D2: {}, SL: {}&quot;.format(D0,D1,D2,SL))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The fractal biomarkers are D0: 1.3108560242559306, D1: 1.2990298019085615, D2: 1.2969899646342158, SL: 0.7232841382079696
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="FractalAnalysis.html" class="btn btn-neutral float-left" title="FractalAnalysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, JF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
