@@ -78,13 +78,13 @@ class GeometricalVBMs:
     
     :rtype: (float, np.ndarray)
     """
-    
+        segmentation = segmentation
         filter_ = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
-        derivative = convolve2d(img.T,filter_, mode="same")
+        derivative = convolve2d(segmentation,filter_, mode="same")
         border = derivative>0
-        segmentation_skeleton = skeletonize(np.ascontiguousarray(border.T)).T
-        perim,_ = compute_perimeter_(segmentation_skeleton)
-        return perim,segmentation_skeleton.T
+        segmentation_skeleton = skeletonize(np.ascontiguousarray(border))
+        perim,_ = compute_perimeter_(segmentation_skeleton.copy())
+        return perim,segmentation_skeleton
     
     def compute_branching_angles(self,segmentation_skeleton):
         """

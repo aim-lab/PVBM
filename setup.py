@@ -8,7 +8,7 @@ long_description = read_readme("README.md")
 
 setup(
     name='pvbm',
-    version='2.1.6',
+    version='2.1.8',
     packages=find_packages(),
     install_requires=[
         "numpy",
