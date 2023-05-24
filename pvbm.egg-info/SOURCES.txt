@@ -6,6 +6,7 @@ PVBM/__init__.py
 PVBM/helpers/__init__.py
 PVBM/helpers/branching2.py
 PVBM/helpers/branching_angle.py
+PVBM/helpers/perimeter.py
 PVBM/helpers/tortuosity.py
 pvbm.egg-info/PKG-INFO
 pvbm.egg-info/SOURCES.txt
