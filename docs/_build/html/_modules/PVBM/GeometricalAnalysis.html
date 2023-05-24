@@ -75,7 +75,7 @@
 <span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">convolve2d</span>
 <span class="kn">from</span> <span class="nn">PVBM.helpers.tortuosity</span> <span class="kn">import</span> <span class="n">compute_tortuosity</span>
-<span class="c1">#from PVBM.helpers.perimeter import compute_perimeter</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.perimeter</span> <span class="kn">import</span> <span class="n">compute_perimeter_</span>
 <span class="kn">from</span> <span class="nn">PVBM.helpers.branching_angle</span> <span class="kn">import</span> <span class="n">compute_angles_dictionary</span>
 <span class="c1">#from PVBM.helpers.far import far</span>
 
@@ -151,11 +151,12 @@
 <span class="sd">    </span>
 <span class="sd">    :rtype: (float, np.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    
         <span class="n">filter_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-        <span class="n">derivative</span> <span class="o">=</span> <span class="n">convolve2d</span><span class="p">(</span><span class="n">segmentation</span><span class="p">,</span><span class="n">filter_</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">)</span>
+        <span class="n">derivative</span> <span class="o">=</span> <span class="n">convolve2d</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">filter_</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">)</span>
         <span class="n">border</span> <span class="o">=</span> <span class="n">derivative</span><span class="o">&gt;</span><span class="mi">0</span>
         <span class="n">segmentation_skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">border</span><span class="o">.</span><span class="n">T</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">_</span><span class="p">,</span><span class="n">perim</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">compute_tortuosity</span><span class="p">(</span><span class="n">segmentation_skeleton</span><span class="p">)</span>
+        <span class="n">perim</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">compute_perimeter_</span><span class="p">(</span><span class="n">segmentation_skeleton</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">perim</span><span class="p">,</span><span class="n">segmentation_skeleton</span><span class="o">.</span><span class="n">T</span></div>
     
 <div class="viewcode-block" id="GeometricalVBMs.compute_branching_angles"><a class="viewcode-back" href="../../GeometricalAnalysis.html#PVBM.GeometricalAnalysis.GeometricalVBMs.compute_branching_angles">[docs]</a>    <span class="k">def</span> <span class="nf">compute_branching_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">segmentation_skeleton</span><span class="p">):</span>
