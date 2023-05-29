@@ -92,7 +92,7 @@ def recursive(i_or,j_or,skeleton,i,j,visited,all_important_index,connected,dist,
             else : 
                 recursive(i_or,j_or,skeleton,down_left[0],down_left[1],visited,all_important_index,connected,dist+1 , plot = plot)
                 
-    if down_right[0] < len(skeleton) and down_right[1] >=0 and visited[down_right] ==0:
+    if down_right[0] < len(skeleton) and down_right[1] < len(skeleton) and visited[down_right] ==0:
         visited[down_right] = 1
         if skeleton[down_right[0]][down_right[1]] ==1:            
             if dist == max_size:
