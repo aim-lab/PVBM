@@ -1,5 +1,0 @@
-nbsphinx
-numpy
-scipy
-scikit-image
-pillow
