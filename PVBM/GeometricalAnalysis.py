@@ -63,8 +63,8 @@ class GeometricalVBMs:
     
     :rtype: (float, float, list, list, dict)
     """
-        median_tor,length,tor,l,connection_dico = compute_tortuosity(segmentation_skeleton)
-        return median_tor,length ,tor,l,connection_dico
+        median_tor,length,arc,chord,connection_dico = compute_tortuosity(segmentation_skeleton)
+        return median_tor,length ,chord, arc,connection_dico
 
     def compute_perimeter(self,segmentation):
         """

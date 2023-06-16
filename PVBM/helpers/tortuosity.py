@@ -51,16 +51,18 @@ def compute_tortuosity(skeleton):
     origin_points = [(i, j) for i in range(particular.shape[0]) for j in range(particular.shape[1]) if particular[i, j]]
     connection_dico = connected_pixels(skeleton, origin_points)
     tor = []
-    l = []
+    chord = []
+    arc = []
     for key, value in connection_dico.items():
         x, y = key
         for p, d in value:
-            l.append(d)
             if d > 10:
+                arc.append(d)
                 x2, y2 = p
                 real_d = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
-                tor.append(d / real_d)
-    return np.median(tor), np.sum(l), tor, l, connection_dico
+                tor.append(d/real_d)
+                chord.append(real_d)
+    return np.median(tor), np.sum(chord), arc, chord, connection_dico
 
 
     
