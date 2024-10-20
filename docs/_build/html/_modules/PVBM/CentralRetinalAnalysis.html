@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PVBM.CentralRetinalAnalysis &mdash; PVBM 2.9.9.1 documentation</title>
+  <title>PVBM.CentralRetinalAnalysis &mdash; PVBM 2.9.9.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -262,6 +262,7 @@
 <div class="viewcode-block" id="CREVBMs.compute_central_retinal_equivalents"><a class="viewcode-back" href="../../CentralRetinalAnalysis.html#PVBM.CentralRetinalAnalysis.CREVBMs.compute_central_retinal_equivalents">[docs]</a>    <span class="k">def</span> <span class="nf">compute_central_retinal_equivalents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">blood_vessel</span><span class="p">,</span> <span class="n">skeleton</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">artery</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">Toplot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the CRAE or CRVE equivalent for a given blood vessel graph.</span>
+
 <span class="sd">        :param blood_vessel: blood_vessel segmentation containing binary values within {0,1}</span>
 <span class="sd">        :type blood_vessel: np.array</span>
 <span class="sd">        :param skeleton: blood_vessel segmentation skeleton containing binary values within {0,1}</span>
@@ -327,9 +328,10 @@
         <span class="k">for</span> <span class="n">idx_start</span> <span class="ow">in</span> <span class="n">starting_point_list</span><span class="p">:</span>
             <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx_start</span>
             <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">((</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-            <span class="n">tree</span><span class="o">.</span><span class="n">recursive_CRE</span><span class="p">(</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">iterative_CRE</span><span class="p">(</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                             <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plotted_tmp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">blood_vessel</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span>
                             <span class="n">radius_zone_C</span><span class="p">)</span>
+
             <span class="n">dico</span><span class="p">[(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">tree</span>
 
         <span class="n">tree_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dico</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -345,7 +347,7 @@
                     <span class="n">idx_start</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startpoint</span>
                     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx_start</span>
                     <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">((</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-                    <span class="n">tree</span><span class="o">.</span><span class="n">recursive_CRE</span><span class="p">(</span><span class="n">skoustideB_reg</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">tree</span><span class="o">.</span><span class="n">iterative_CRE</span><span class="p">(</span><span class="n">skoustideB_reg</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                                     <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plotted_tmp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">blood_vessel</span><span class="p">,</span>
                                     <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">radius_zone_C</span><span class="p">)</span>
                     <span class="n">final_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>  <span class="c1"># .remove_children())</span>
@@ -358,14 +360,12 @@
         <span class="n">plotable_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">final_list</span><span class="p">:</span>
             <span class="n">tree</span><span class="o">.</span><span class="n">plotable_show_tree</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">,</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">Toplot</span> <span class="o">=</span> <span class="n">Toplot</span><span class="p">)</span>
-
         <span class="c1">### Compute and return the CRE VBMs</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">blood_vessel_lista</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">blood_vessel_lista</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Mean diameter&#39;</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">)):</span>
                 <span class="n">blood_vessel_lista</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;Mean diameter&#39;</span><span class="p">])</span>
-
             <span class="k">if</span> <span class="n">artery</span><span class="p">:</span>
                 <span class="n">craek</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">blood_vessel_lista</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">crae_knudtson</span><span class="p">)</span>
                 <span class="n">craeh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">blood_vessel_lista</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">crae_hubbard</span><span class="p">)</span>
@@ -379,6 +379,40 @@
                 <span class="k">return</span> <span class="p">({</span><span class="s2">&quot;craek&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;craeh&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">({</span><span class="s2">&quot;craek&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;craeh&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span></div></div>
+
+<span class="c1"># if __name__ == &quot;__main__&quot;:</span>
+<span class="c1">#     import numpy as np</span>
+<span class="c1">#     from skimage.morphology import skeletonize</span>
+<span class="c1">#     from PIL import Image</span>
+<span class="c1">#</span>
+<span class="c1">#     center = (1278,721)</span>
+<span class="c1">#     radius = 103</span>
+<span class="c1">#</span>
+<span class="c1">#     blood_vessel_segmentation_path = &#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/segmentation/DR_2_ICDR.jpg&#39;</span>
+<span class="c1">#     segmentation = np.array(Image.open(blood_vessel_segmentation_path)) / 255  # Open the segmentation</span>
+<span class="c1">#     segmentation = segmentation[:,:,2]</span>
+<span class="c1">#     skeleton = skeletonize(segmentation) * 1</span>
+<span class="c1">#     creVBM = CREVBMs()  # Instanciate a geometrical VBM object</span>
+<span class="c1">#</span>
+<span class="c1">#     roi = &#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/ROI/DR_2_ICDR.jpg&#39;</span>
+<span class="c1">#     roi = np.array(Image.open(roi))</span>
+<span class="c1">#</span>
+<span class="c1">#     zones_ABC = &#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/zones_ABC/DR_2_ICDR.jpg&#39;</span>
+<span class="c1">#     zones_ABC = np.array(Image.open(zones_ABC))</span>
+<span class="c1">#</span>
+<span class="c1">#     segmentation_roi, skeleton_roi = creVBM.apply_roi(</span>
+<span class="c1">#         segmentation=segmentation,</span>
+<span class="c1">#         skeleton=skeleton,</span>
+<span class="c1">#         zones_ABC=zones_ABC,</span>
+<span class="c1">#     )</span>
+<span class="c1">#</span>
+<span class="c1">#     vbms, visual = creVBM.compute_central_retinal_equivalents(</span>
+<span class="c1">#         blood_vessel=segmentation_roi,</span>
+<span class="c1">#         skeleton=skeleton_roi,</span>
+<span class="c1">#         xc=center[0],</span>
+<span class="c1">#         yc=center[1],</span>
+<span class="c1">#         radius=radius</span>
+<span class="c1">#     )</span>
 </pre></div>
 
            </div>

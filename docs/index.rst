@@ -60,21 +60,21 @@ From this A/V segmentation, we can compute vasculature biomarkers, which are qua
 
 Fifteen biomarkers have been engineered independently on the arterioles and venules segmentation, namely:
 
-* **Area**: This refers to the density of the blood vessels calculated as the total number of pixels in the segmentation and is expressed in square pixels (:math:`pixels^2`).
-* **Length**: This represents the cumulative length of the blood vessel derived from the segmentation. It is computed as the necessary distance to traverse the entire segmentation and is expressed in pixels.
-* **Tortuosity Index**: This is a tortuosity measure based on the overall arc-chord ratio.
-* **Median Tortuosity**: This is the median value of the tortuosity distribution for all blood vessels, computed using the arc-chord ratio.
-* **Number of Startpoints**: This refers to the count of points in the segmentation that correspond to the beginning of a blood vessel outside the optic disc.
-* **Number of Endpoints**: This refers to the count of points in the segmentation that correspond to the termination of a blood vessel.
-* **Number of Intersection Points**: This is the count of points in the segmentation that correspond to an intersection within a blood vessel.
-* **Median Branching Angle**: This is the median value of the branching angle distribution for all blood vessels, and it is expressed in degrees (°).
-* **Capacity Dimension**: D0 (also known as the box-counting dimension) is a measure of the space-filling capacity of the pattern.
-* **Entropy Dimension**: D1 (also known as the entropy dimension) is a measure of the distribution of the pattern.
-* **Correlation Dimension**: D2 (also known as the correlation dimension) is a measure of the correlation of the pattern.
-* **Singularity Length**: SL represents the range of fluctuation in the fractal dimension, providing information about the complexity of local variations in the image.
-* **Central Retinal Arteriolar Equivalent (Knudtson and Hubbard)**: CRAE is a summary measure of the width of retinal arterioles. This measure is used to assess the health of the retinal microvasculature.
-* **Central Retinal Venular Equivalent (Knudtson and Hubbard)**: CRVE is a summary measure of the width of retinal venules. This measure helps in evaluating the condition of the retinal veins.
-* **Arterio-Venous Ratio (Knudtson and Hubbard)**: The AVR is calculated using the ratios of CRAE and CRVE. This ratio is used to assess the relationship between the retinal arterioles and venules, providing insights into vascular health and potential cardiovascular risk factors. (It is not included in the tutorial but can be easily inferred by dividing the CRAE by the CRVE.)
+* **Area**: Area of the blood vessels computed by summing the number of pixels within the segmented arteriole or venule regions. Expressed in square pixels.
+* **Length**: Cumulative length of the segmented blood vessels, calculated as the distance required to traverse the entire skeleton. Expressed in pixels.
+* **Tortuosity Index**: Tortuosity measure based on the overall arc-chord ratio.
+* **Median Tortuosity**: Median value of the per-vessel tortuosity, computed using the arc-chord ratio.
+* **Number of Startpoints**: Number of skeleton points situated on the optic disc, representing vessel start points.
+* **Number of Endpoints**: Number of skeleton points terminating the blood vessels.
+* **Number of Intersection Points**: Number of skeleton points where vessels branch into two smaller vessels.
+* **Median Branching Angle**: Median value of the branching angle distribution evaluated for all blood vessels. Expressed in degrees (°).
+* **Capacity Dimension**: Also known as the box-counting dimension, measuring the space-filling capacity of the pattern.
+* **Entropy Dimension**: Also known as the entropy dimension, measuring the distribution of the pattern.
+* **Correlation Dimension**: Also known as the correlation dimension, measuring the correlation of the pattern.
+* **Singularity Length**: Range of fluctuation in the fractal dimension, providing insights into the complexity of local variations within the image.
+* **Central Retinal Arteriolar Equivalent (Knudtson and Hubbard)**: Central Retinal Arterial Equivalent (CRAE) computed using the Knudtson or Hubbard formula, estimating the caliber of the central retinal arteriole.
+* **Central Retinal Venular Equivalent (Knudtson and Hubbard)**: Central Retinal Venous Equivalent (CRVE) computed using the Knudtson or Hubbard formula, estimating the caliber of the central retinal vein.
+* **Arterio-Venous Ratio (Knudtson and Hubbard)**: The AVR is calculated using the ratios of CRAE and CRVE. This ratio assesses the relationship between retinal arterioles and venules, providing insights into vascular health and potential cardiovascular risk factors. (It is not included in the tutorial but can be easily inferred by dividing the CRAE by the CRVE.)
 
 Look at the `tutorial <https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb>`_ for a code example.
 

@@ -233,130 +233,208 @@ class Tree:
         total_distance = distance_pos + distance_neg
         return total_distance
 
-    def recursive_CRE(self,A, B, D, i, j, n, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5, pj5, pi6, pj6, plotted_tmp, i_or,
-                        j_or, curtree, gt, x_c, y_c, radius_zone_C, p=0, ultimatum=False):
+    # def recursive_CRE(self,A, B, D, i, j, n, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5, pj5, pi6, pj6, plotted_tmp, i_or,
+    #                     j_or, curtree, gt, x_c, y_c, radius_zone_C, p=0, ultimatum=False):
+    #     """
+    #     Recursively track the topology required to computed CRAE or CRVE equivalent for a given blood vessel graph.
+    #
+    #     This function traverses a segmented image to compute the diameter of blood vessels and updates the current tree
+    #     structure with the computed diameters. The function also handles visualization and ensures that the traversal
+    #     respects the boundaries of the given region.
+    #
+    #     :param A: The array representing the binary blood vessel segmentation.
+    #     :type A: np.array
+    #     :param B: An auxiliary array used for processing.
+    #     :type B: np.array
+    #     :param D: Another auxiliary array used for processing.
+    #     :type D: np.array
+    #     :param i: The current x-coordinate.
+    #     :type i: int
+    #     :param j: The current y-coordinate.
+    #     :type j: int
+    #     :param n: The current recursion depth.
+    #     :type n: int
+    #     :param pi: Previous x-coordinate.
+    #     :type pi: int
+    #     :param pj: Previous y-coordinate.
+    #     :type pj: int
+    #     :param pi2: Second previous x-coordinate.
+    #     :type pi2: int
+    #     :param pj2: Second previous y-coordinate.
+    #     :type pi2: int
+    #     :param pj2: int
+    #     :param pi3: Third previous x-coordinate.
+    #     :type pi3: int
+    #     :param pj3: Third previous y-coordinate.
+    #     :type pi3: int
+    #     :param pj3: int
+    #     :param pi4: Fourth previous x-coordinate.
+    #     :type pi4: int
+    #     :param pj4: Fourth previous y-coordinate.
+    #     :type pi4: int
+    #     :param pj4: int
+    #     :param pi5: Fifth previous x-coordinate.
+    #     :type pi5: int
+    #     :param pj5: Fifth previous y-coordinate.
+    #     :type pi5: int
+    #     :param pj5: int
+    #     :param pi6: Sixth previous x-coordinate.
+    #     :type pi6: int
+    #     :param pj6: Sixth previous y-coordinate.
+    #     :type pi6: int
+    #     :param pj6: int
+    #     :param plotted_tmp: A temporary plot holder to be updated with the computed line.
+    #     :type plotted_tmp: np.array or None
+    #     :param i_or: The original x-coordinate of the starting point.
+    #     :type i_or: int
+    #     :param j_or: The original y-coordinate of the starting point.
+    #     :type j_or: int
+    #     :param curtree: The current tree structure being updated with diameters.
+    #     :type curtree: PVBM.GraphCentralRetinalEquivalent.Tree
+    #     :param gt: The ground truth 2D array used to determine boundary conditions.
+    #     :type gt: np.array
+    #     :param x_c: The x-coordinate of the optic disc center.
+    #     :type x_c: int
+    #     :param y_c: The y-coordinate of the optic disc center.
+    #     :type y_c: int
+    #     :param radius_zone_C: The radius of the optic disc zone.
+    #     :type radius_zone_C: int
+    #     :param p: An auxiliary parameter used for processing.
+    #     :type p: int
+    #     :param ultimatum: A flag used to determine specific processing conditions.
+    #     :type ultimatum: bool
+    #
+    #     :return: None
+    #     """
+    #     up = (i - 1, j)
+    #     down = (i + 1, j)
+    #     left = (i, j - 1)
+    #     right = (i, j + 1)
+    #
+    #     up_left = (i - 1, j - 1)
+    #     up_right = (i - 1, j + 1)
+    #     down_left = (i + 1, j - 1)
+    #     down_right = (i + 1, j + 1)
+    #     points = [up, down, left, right, up_left, up_right, down_left, down_right]
+    #     children = np.sum([A[point] for point in points])
+    #     diameter = 0
+    #     if n >= 10:
+    #         if pi6 != None:
+    #             if plotted_tmp is not None:
+    #                 prev_plot = plotted_tmp.copy()
+    #             diameter = self.compute_perpendicular_line(A, i, j, pi6, pj6, plotted_tmp, gt)
+    #             if diameter is not None:
+    #                 p_up = None
+    #                 if plotted_tmp is not None:
+    #                     p_up = plotted_tmp - prev_plot
+    #                 curtree.update(diameter, p_up)
+    #     else:
+    #         curtree = curtree.add_children((i, j))
+    #
+    #     if ((x_c - i) ** 2 + (
+    #             y_c - j) ** 2) ** 0.5 > radius_zone_C:  # and np.mean(curtree.diameter_list)*6 <= 80  and ultimatum == False:
+    #         curtree.finished((i, j))
+    #         return
+    #
+    #     # elif (children==0 or children >1) and len(curtree.diameter_list) > 30: #and ultimatum == True:
+    #     #    curtree.finished((i,j))
+    #     #    return
+    #
+    #     elif children == 0:
+    #         curtree.finished((i, j))
+    #         return
+    #
+    #     elif children > 1:
+    #         if np.mean(curtree.diameter_list) * 6 > 80 and len(curtree.diameter_list) > 30:
+    #             # ultimatum = True
+    #             todo = 0
+    #         curtree = curtree.add_children((i, j))
+    #         if plotted_tmp is not None:
+    #             plotted_tmp = np.zeros((A.shape[0], A.shape[1]))
+    #         n = 0
+    #         p += 1
+    #
+    #     for point in points:
+    #         if point[0] >= 0 and point[0] < B.shape[0] and point[1] < B.shape[1] and point[1] >= 0:
+    #             if A[point] == 1:
+    #                 A[point] = 0
+    #                 self.recursive_CRE(A, B, D, point[0], point[1], n + 1, i, j, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5,
+    #                                 pj5, plotted_tmp, i_or, j_or, curtree, gt, x_c, y_c, radius_zone_C, p, ultimatum)
+
+
+    #Moved to iterative due to stack overflow in c
+    def iterative_CRE(self, A, B, D, i, j, n, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5, pj5, pi6, pj6, plotted_tmp,
+                      i_or,
+                      j_or, curtree, gt, x_c, y_c, radius_zone_C, p=0, ultimatum=False):
         """
-        Recursively track the topology required to computed CRAE or CRVE equivalent for a given blood vessel graph.
-
-        This function traverses a segmented image to compute the diameter of blood vessels and updates the current tree
-        structure with the computed diameters. The function also handles visualization and ensures that the traversal
-        respects the boundaries of the given region.
-
-        :param A: The array representing the binary blood vessel segmentation.
-        :type A: np.array
-        :param B: An auxiliary array used for processing.
-        :type B: np.array
-        :param D: Another auxiliary array used for processing.
-        :type D: np.array
-        :param i: The current x-coordinate.
-        :type i: int
-        :param j: The current y-coordinate.
-        :type j: int
-        :param n: The current recursion depth.
-        :type n: int
-        :param pi: Previous x-coordinate.
-        :type pi: int
-        :param pj: Previous y-coordinate.
-        :type pj: int
-        :param pi2: Second previous x-coordinate.
-        :type pi2: int
-        :param pj2: Second previous y-coordinate.
-        :type pi2: int
-        :param pj2: int
-        :param pi3: Third previous x-coordinate.
-        :type pi3: int
-        :param pj3: Third previous y-coordinate.
-        :type pi3: int
-        :param pj3: int
-        :param pi4: Fourth previous x-coordinate.
-        :type pi4: int
-        :param pj4: Fourth previous y-coordinate.
-        :type pi4: int
-        :param pj4: int
-        :param pi5: Fifth previous x-coordinate.
-        :type pi5: int
-        :param pj5: Fifth previous y-coordinate.
-        :type pi5: int
-        :param pj5: int
-        :param pi6: Sixth previous x-coordinate.
-        :type pi6: int
-        :param pj6: Sixth previous y-coordinate.
-        :type pi6: int
-        :param pj6: int
-        :param plotted_tmp: A temporary plot holder to be updated with the computed line.
-        :type plotted_tmp: np.array or None
-        :param i_or: The original x-coordinate of the starting point.
-        :type i_or: int
-        :param j_or: The original y-coordinate of the starting point.
-        :type j_or: int
-        :param curtree: The current tree structure being updated with diameters.
-        :type curtree: PVBM.GraphCentralRetinalEquivalent.Tree
-        :param gt: The ground truth 2D array used to determine boundary conditions.
-        :type gt: np.array
-        :param x_c: The x-coordinate of the optic disc center.
-        :type x_c: int
-        :param y_c: The y-coordinate of the optic disc center.
-        :type y_c: int
-        :param radius_zone_C: The radius of the optic disc zone.
-        :type radius_zone_C: int
-        :param p: An auxiliary parameter used for processing.
-        :type p: int
-        :param ultimatum: A flag used to determine specific processing conditions.
-        :type ultimatum: bool
-
-        :return: None
+        Iteratively track the topology required to compute CRAE or CRVE equivalent for a given blood vessel graph.
+        Equivalent to the recursive_CRE function but uses an iterative approach with a stack.
         """
-        up = (i - 1, j)
-        down = (i + 1, j)
-        left = (i, j - 1)
-        right = (i, j + 1)
+        # Stack to hold the state of variables for each iteration
+        stack = [(i, j, n, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5, pj5, pi6, pj6, plotted_tmp, i_or, j_or, p,
+                  ultimatum, curtree)]
 
-        up_left = (i - 1, j - 1)
-        up_right = (i - 1, j + 1)
-        down_left = (i + 1, j - 1)
-        down_right = (i + 1, j + 1)
-        points = [up, down, left, right, up_left, up_right, down_left, down_right]
-        children = np.sum([A[point] for point in points])
-        diameter = 0
-        if n >= 10:
-            if pi6 != None:
-                if plotted_tmp is not None:
-                    prev_plot = plotted_tmp.copy()
-                diameter = self.compute_perpendicular_line(A, i, j, pi6, pj6, plotted_tmp, gt)
-                if diameter is not None:
-                    p_up = None
+        while stack:
+            # Unpack the state including i_or and j_or
+            i, j, n, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5, pj5, pi6, pj6, plotted_tmp, i_or, j_or, p, ultimatum, curtree = stack.pop()
+
+            # Directions to move in
+            up = (i - 1, j)
+            down = (i + 1, j)
+            left = (i, j - 1)
+            right = (i, j + 1)
+
+            up_left = (i - 1, j - 1)
+            up_right = (i - 1, j + 1)
+            down_left = (i + 1, j - 1)
+            down_right = (i + 1, j + 1)
+
+            points = [up, down, left, right, up_left, up_right, down_left, down_right]
+
+            # Count children (valid neighboring pixels that are part of the vessel)
+            children = np.sum(
+                [A[point] for point in points if 0 <= point[0] < B.shape[0] and 0 <= point[1] < B.shape[1]])
+
+            # If recursion depth >= 10, compute the diameter
+            # print(i,j,children,pi6,pj6)
+            if n >= 10:
+                if pi6 is not None:
                     if plotted_tmp is not None:
-                        p_up = plotted_tmp - prev_plot
-                    curtree.update(diameter, p_up)
-        else:
-            curtree = curtree.add_children((i, j))
+                        prev_plot = plotted_tmp.copy()
+                    diameter = self.compute_perpendicular_line(A, i, j, pi6, pj6, plotted_tmp, gt)
+                    if diameter is not None:
+                        p_up = None
+                        if plotted_tmp is not None:
+                            p_up = plotted_tmp - prev_plot
+                        curtree.update(diameter, p_up)
+            else:
+                curtree = curtree.add_children((i, j))
 
-        if ((x_c - i) ** 2 + (
-                y_c - j) ** 2) ** 0.5 > radius_zone_C:  # and np.mean(curtree.diameter_list)*6 <= 80  and ultimatum == False:
-            curtree.finished((i, j))
-            return
+            # Exit conditions based on distance from center
+            if ((x_c - i) ** 2 + (y_c - j) ** 2) ** 0.5 > radius_zone_C:
+                curtree.finished((i, j))
+                continue
 
-        # elif (children==0 or children >1) and len(curtree.diameter_list) > 30: #and ultimatum == True:
-        #    curtree.finished((i,j))
-        #    return
+            # If no children, finish this branch
+            elif children == 0:
+                curtree.finished((i, j))
+                continue
 
-        elif children == 0:
-            curtree.finished((i, j))
-            return
+            # If more than one child, add children and reset state
+            elif children > 1:
+                if np.mean(curtree.diameter_list) * 6 > 80 and len(curtree.diameter_list) > 30:
+                    pass  # Handle special condition if needed
+                curtree = curtree.add_children((i, j))
+                if plotted_tmp is not None:
+                    plotted_tmp = np.zeros((A.shape[0], A.shape[1]))
+                n = 0
+                p += 1
 
-        elif children > 1:
-            if np.mean(curtree.diameter_list) * 6 > 80 and len(curtree.diameter_list) > 30:
-                # ultimatum = True
-                todo = 0
-            curtree = curtree.add_children((i, j))
-            if plotted_tmp is not None:
-                plotted_tmp = np.zeros((A.shape[0], A.shape[1]))
-            n = 0
-            p += 1
-
-        for point in points:
-            if point[0] >= 0 and point[0] < B.shape[0] and point[1] < B.shape[1] and point[1] >= 0:
-                if A[point] == 1:
+            # Push neighbors onto the stack for further exploration
+            for point in points:
+                if 0 <= point[0] < B.shape[0] and 0 <= point[1] < B.shape[1] and A[point] == 1:
                     A[point] = 0
-                    self.recursive_CRE(A, B, D, point[0], point[1], n + 1, i, j, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5,
-                                    pj5, plotted_tmp, i_or, j_or, curtree, gt, x_c, y_c, radius_zone_C, p, ultimatum)
+                    # Push the new state onto the stack with i_or and j_or included
+                    stack.append(
+                        (point[0], point[1], n + 1, i, j, pi, pj, pi2, pj2, pi3, pj3, pi4, pj4, pi5, pj5,
+                         plotted_tmp, i_or, j_or, p, ultimatum, curtree))

@@ -186,6 +186,7 @@ class CREVBMs:
     def compute_central_retinal_equivalents(self,blood_vessel, skeleton, xc,yc, radius, artery = True, Toplot = False):
         """
         Compute the CRAE or CRVE equivalent for a given blood vessel graph.
+
         :param blood_vessel: blood_vessel segmentation containing binary values within {0,1}
         :type blood_vessel: np.array
         :param skeleton: blood_vessel segmentation skeleton containing binary values within {0,1}
@@ -251,9 +252,10 @@ class CREVBMs:
         for idx_start in starting_point_list:
             i, j = idx_start
             tree = Tree((idx_start[0],idx_start[1]),(idx_start[0],idx_start[1]))
-            tree.recursive_CRE(skeleton.copy(), B, D, idx_start[0], idx_start[1], 1, None, None, None, None, None,
+            tree.iterative_CRE(skeleton.copy(), B, D, idx_start[0], idx_start[1], 1, None, None, None, None, None,
                             None, None, None, None, None, None, None, plotted_tmp, i, j, tree, blood_vessel, xc, yc,
                             radius_zone_C)
+
             dico[(idx_start[0], idx_start[1])] = tree
 
         tree_list = list(dico.values())
@@ -269,7 +271,7 @@ class CREVBMs:
                     idx_start = tmp[0].startpoint
                     i, j = idx_start
                     tree = Tree((idx_start[0], idx_start[1]), (idx_start[0], idx_start[1]))
-                    tree.recursive_CRE(skoustideB_reg.copy(), B, D, idx_start[0], idx_start[1], 1, None, None, None,
+                    tree.iterative_CRE(skoustideB_reg.copy(), B, D, idx_start[0], idx_start[1], 1, None, None, None,
                                     None, None, None, None, None, None, None, None, None, plotted_tmp, i, j, tree, blood_vessel,
                                     xc, yc, radius_zone_C)
                     final_list.append(tree)  # .remove_children())
@@ -282,14 +284,12 @@ class CREVBMs:
         plotable_list = []
         for tree in final_list:
             tree.plotable_show_tree(plotable_list, blood_vessel.shape, Toplot = Toplot)
-
         ### Compute and return the CRE VBMs
         if len(plotable_list) != 0:
             blood_vessel_lista = []
             blood_vessel_lista.append(plotable_list[0]['Mean diameter'])
             for j in range(1, len(plotable_list)):
                 blood_vessel_lista.append(plotable_list[j]['Mean diameter'])
-
             if artery:
                 craek = self.central_equivalent(np.sort(blood_vessel_lista)[-6:], self.crae_knudtson)
                 craeh = self.central_equivalent(np.sort(blood_vessel_lista)[-6:], self.crae_hubbard)
@@ -303,3 +303,37 @@ class CREVBMs:
                 return ({"craek": -1, "craeh": -1}, None)
             else:
                 return ({"craek": -1, "craeh": -1}, None)
+
+# if __name__ == "__main__":
+#     import numpy as np
+#     from skimage.morphology import skeletonize
+#     from PIL import Image
+#
+#     center = (1278,721)
+#     radius = 103
+#
+#     blood_vessel_segmentation_path = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/segmentation/DR_2_ICDR.jpg'
+#     segmentation = np.array(Image.open(blood_vessel_segmentation_path)) / 255  # Open the segmentation
+#     segmentation = segmentation[:,:,2]
+#     skeleton = skeletonize(segmentation) * 1
+#     creVBM = CREVBMs()  # Instanciate a geometrical VBM object
+#
+#     roi = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/ROI/DR_2_ICDR.jpg'
+#     roi = np.array(Image.open(roi))
+#
+#     zones_ABC = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/zones_ABC/DR_2_ICDR.jpg'
+#     zones_ABC = np.array(Image.open(zones_ABC))
+#
+#     segmentation_roi, skeleton_roi = creVBM.apply_roi(
+#         segmentation=segmentation,
+#         skeleton=skeleton,
+#         zones_ABC=zones_ABC,
+#     )
+#
+#     vbms, visual = creVBM.compute_central_retinal_equivalents(
+#         blood_vessel=segmentation_roi,
+#         skeleton=skeleton_roi,
+#         xc=center[0],
+#         yc=center[1],
+#         radius=radius
+#     )

@@ -77,99 +77,268 @@ class GeometricalVBMs:
                     D[point] = ((y_c - point[0]) ** 2 + (x_c - point[1]) ** 2) ** 0.5
                     self.recursive_subgraph(A, B, D, point[0], point[1], n, x_c, y_c)
 
-    def recursive_topology(self,A, B, i, j, n, max_radius, x_c, y_c, endpoints, interpoints, i_or, j_or, dico, bacount, bapos,
-                        dist=0):
+    # def recursive_topology(self,A, B, i, j, n, max_radius, x_c, y_c, endpoints, interpoints, i_or, j_or, dico, bacount, bapos,
+    #                     dist=0):
+    #     """
+    #     Recursively compute and analyze the topology of a segmented image.
+    #
+    #     This function traverses a segmented image to identify endpoints and intersection points of a structure, and
+    #     calculates various distance metrics. The results are stored in a dictionary for further analysis.
+    #
+    #     :param A: The array representing the binary segmentation of the structure.
+    #     :type A: np.array
+    #     :param B: An auxiliary array used for processing.
+    #     :type B: np.array
+    #     :param i: The current x-coordinate.
+    #     :type i: int
+    #     :param j: The current y-coordinate.
+    #     :type j: int
+    #     :param n: The current recursion depth.
+    #     :type n: int
+    #     :param max_radius: The maximum allowed radius for the traversal.
+    #     :type max_radius: float
+    #     :param x_c: The x-coordinate of the center of the structure.
+    #     :type x_c: int
+    #     :param y_c: The y-coordinate of the center of the structure.
+    #     :type y_c: int
+    #     :param endpoints: The array to mark endpoints of the structure.
+    #     :type endpoints: np.array
+    #     :param interpoints: The array to mark intersection points of the structure.
+    #     :type interpoints: np.array
+    #     :param i_or: The original x-coordinate of the starting point.
+    #     :type i_or: int
+    #     :param j_or: The original y-coordinate of the starting point.
+    #     :type j_or: int
+    #     :param dico: A dictionary to store computed distance metrics.
+    #     :type dico: dict
+    #     :param bacount: A counter to track the number of recursive steps.
+    #     :type bacount: int
+    #     :param bapos: The backup position for the traversal.
+    #     :type bapos: tuple or None
+    #     :param dist: The cumulative distance of the traversal.
+    #     :type dist: float
+    #
+    #     :return: None
+    #     """
+    #     up = (i - 1, j)
+    #     down = (i + 1, j)
+    #     left = (i, j - 1)
+    #     right = (i, j + 1)
+    #
+    #     up_left = (i - 1, j - 1)
+    #     up_right = (i - 1, j + 1)
+    #     down_left = (i + 1, j - 1)
+    #     down_right = (i + 1, j + 1)
+    #     points = [up, down, left, right, up_left, up_right, down_left, down_right]
+    #     children = np.sum([A[point] for point in points])
+    #     distances = [1, 1, 1, 1, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5]
+    #
+    #     # print(f"Processing node: i={i}, j={j}, i_or={i_or}, j_or={j_or}, dist={dist},n={n} \n")
+    #
+    #     if ((y_c - i) ** 2 + (
+    #             x_c - j) ** 2) ** 0.5 > max_radius:  # and np.mean(curtree.diameter_list)*6 <= 80  and ultimatum == False:
+    #         endpoints[i, j] = 1
+    #         true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5
+    #         dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)
+    #         return
+    #
+    #     elif children == 0 and n >= 10:
+    #         endpoints[i, j] = 1
+    #         true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5
+    #         dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)
+    #         i_or, j_or = i, j
+    #         dist = 0
+    #         return
+    #
+    #     elif children > 1 and n >= 10:
+    #         interpoints[i, j] = 1
+    #         true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5
+    #         dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)
+    #         i_or, j_or = i, j
+    #         dist = 0
+    #         n = 0
+    #         bacount = 0
+    #         bapos = None
+    #     for point, distance in zip(points, distances):
+    #         if point[0] >= 0 and point[0] < B.shape[0] and point[1] < B.shape[1] and point[1] >= 0:
+    #             if A[point] == 1:
+    #                 A[point] = 0
+    #                 if bacount == 30:
+    #                     bapos = point
+    #                     # print("update bapos",bapos)
+    #                     # print(i_or,j_or)
+    #                 self.recursive_topology(A, B, point[0], point[1], n + 1, max_radius, x_c, y_c, endpoints, interpoints, i_or,
+    #                                 j_or, dico, bacount + 1, bapos, distance + dist)
+
+    #Moved to iterative because recursive leads to stack overflow in c
+    def iterative_topology(
+            self, A, B, i, j, n, max_radius, x_c, y_c, endpoints, interpoints,
+            i_or, j_or, dico, bacount, bapos, dist=0
+    ):
         """
-        Recursively compute and analyze the topology of a segmented image.
-
-        This function traverses a segmented image to identify endpoints and intersection points of a structure, and
-        calculates various distance metrics. The results are stored in a dictionary for further analysis.
-
-        :param A: The array representing the binary segmentation of the structure.
-        :type A: np.array
-        :param B: An auxiliary array used for processing.
-        :type B: np.array
-        :param i: The current x-coordinate.
-        :type i: int
-        :param j: The current y-coordinate.
-        :type j: int
-        :param n: The current recursion depth.
-        :type n: int
-        :param max_radius: The maximum allowed radius for the traversal.
-        :type max_radius: float
-        :param x_c: The x-coordinate of the center of the structure.
-        :type x_c: int
-        :param y_c: The y-coordinate of the center of the structure.
-        :type y_c: int
-        :param endpoints: The array to mark endpoints of the structure.
-        :type endpoints: np.array
-        :param interpoints: The array to mark intersection points of the structure.
-        :type interpoints: np.array
-        :param i_or: The original x-coordinate of the starting point.
-        :type i_or: int
-        :param j_or: The original y-coordinate of the starting point.
-        :type j_or: int
-        :param dico: A dictionary to store computed distance metrics.
-        :type dico: dict
-        :param bacount: A counter to track the number of recursive steps.
-        :type bacount: int
-        :param bapos: The backup position for the traversal.
-        :type bapos: tuple or None
-        :param dist: The cumulative distance of the traversal.
-        :type dist: float
-
-        :return: None
+        Iteratively compute and analyze the topology of a segmented image using a stack.
         """
-        up = (i - 1, j)
-        down = (i + 1, j)
-        left = (i, j - 1)
-        right = (i, j + 1)
+        # Initialize the stack with the initial node's state
+        stack = []
+        initial_frame = {
+            'i': i,
+            'j': j,
+            'n': n,
+            'i_or': i_or,
+            'j_or': j_or,
+            'bacount': bacount,
+            'bapos': bapos,
+            'dist': dist,
+            'state': 'process_node'  # Possible states: 'process_node', 'process_children'
+        }
+        stack.append(initial_frame)
+        A[i, j] = 0  # Mark the starting node as visited
 
-        up_left = (i - 1, j - 1)
-        up_right = (i - 1, j + 1)
-        down_left = (i + 1, j - 1)
-        down_right = (i + 1, j + 1)
-        points = [up, down, left, right, up_left, up_right, down_left, down_right]
-        children = np.sum([A[point] for point in points])
-        distances = [1, 1, 1, 1, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5]
+        while stack:
+            # Peek at the last frame on the stack
+            frame = stack[-1]
 
-        if ((y_c - i) ** 2 + (
-                x_c - j) ** 2) ** 0.5 > max_radius:  # and np.mean(curtree.diameter_list)*6 <= 80  and ultimatum == False:
-            endpoints[i, j] = 1
-            true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5
-            dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)
-            i_or, j_or = i, j
-            dist = 0
-            return
+            current_i = frame['i']
+            current_j = frame['j']
+            current_n = frame['n']
+            current_i_or = frame['i_or']
+            current_j_or = frame['j_or']
+            current_bacount = frame['bacount']
+            current_bapos = frame['bapos']
+            current_dist = frame['dist']
+            state = frame['state']
 
-        elif children == 0 and n >= 10:
-            endpoints[i, j] = 1
-            true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5
-            dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)
-            i_or, j_or = i, j
-            dist = 0
-            return
+            if state == 'process_node':
+                # print(
+                #     f"Processing node: i={current_i}, j={current_j}, i_or={current_i_or}, j_or={current_j_or}, dist={current_dist},n={current_n} \n")
 
-        elif children > 1 and n >= 10:
-            interpoints[i, j] = 1
-            true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5
-            dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)
-            i_or, j_or = i, j
-            dist = 0
-            n = 0
-            bacount = 0
-            bapos = None
-        for point, distance in zip(points, distances):
-            if point[0] >= 0 and point[0] < B.shape[0] and point[1] < B.shape[1] and point[1] >= 0:
-                if A[point] == 1:
-                    A[point] = 0
-                    if bacount == 30:
-                        bapos = point
-                        # print("update bapos",bapos)
-                        # print(i_or,j_or)
-                    self.recursive_topology(A, B, point[0], point[1], n + 1, max_radius, x_c, y_c, endpoints, interpoints, i_or,
-                                    j_or, dico, bacount + 1, bapos, distance + dist)
+                # Calculate the Euclidean distance from the center
+                distance_from_center = ((y_c - current_i) ** 2 + (x_c - current_j) ** 2) ** 0.5
 
+                # Base Case 1: If beyond the allowed radius
+                if distance_from_center > max_radius:
+                    endpoints[current_i, current_j] = 1
+                    true_distance = ((current_i_or - current_i) ** 2 + (current_j_or - current_j) ** 2) ** 0.5
+                    dico[(current_i_or, current_j_or, current_i, current_j)] = (
+                        current_dist,
+                        true_distance,
+                        true_distance / current_dist if current_dist != 0 else float('inf'),
+                        current_bapos
+                    )
+                    stack.pop()  # Remove frame from stack
+                    continue  # Proceed to next frame
+
+                # Define all 8 neighbors and their corresponding distances
+                up = (current_i - 1, current_j)
+                down = (current_i + 1, current_j)
+                left = (current_i, current_j - 1)
+                right = (current_i, current_j + 1)
+                up_left = (current_i - 1, current_j - 1)
+                up_right = (current_i - 1, current_j + 1)
+                down_left = (current_i + 1, current_j - 1)
+                down_right = (current_i + 1, current_j + 1)
+                points = [up, down, left, right, up_left, up_right, down_left, down_right]
+                distances = [1, 1, 1, 1, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5]
+
+                # Compute the number of children
+                children = 0
+                valid_children = []
+                child_distances = []
+                for point, distance in zip(points, distances):
+                    pi, pj = point
+                    if 0 <= pi < A.shape[0] and 0 <= pj < A.shape[1]:
+                        if A[pi, pj] == 1:
+                            children += 1
+                            valid_children.append(point)
+                            child_distances.append(distance)
+
+                # Store valid children and distances in the frame
+                frame['valid_children'] = valid_children
+                frame['child_distances'] = child_distances
+                frame['child_index'] = 0  # Index of next child to process
+
+                # Base Case 2: No children and sufficient depth
+                if children == 0 and current_n >= 10:
+                    endpoints[current_i, current_j] = 1
+                    true_distance = ((current_i_or - current_i) ** 2 + (current_j_or - current_j) ** 2) ** 0.5
+                    dico[(current_i_or, current_j_or, current_i, current_j)] = (
+                        current_dist,
+                        true_distance,
+                        true_distance / current_dist if current_dist != 0 else float('inf'),
+                        current_bapos
+                    )
+                    stack.pop()  # Remove frame from stack
+                    continue
+
+                # Base Case 3: More than one child and sufficient depth
+                if children > 1 and current_n >= 10:
+                    interpoints[current_i, current_j] = 1
+                    true_distance = ((current_i_or - current_i) ** 2 + (current_j_or - current_j) ** 2) ** 0.5
+                    dico[(current_i_or, current_j_or, current_i, current_j)] = (
+                        current_dist,
+                        true_distance,
+                        true_distance / current_dist if current_dist != 0 else float('inf'),
+                        current_bapos
+                    )
+                    # Reset variables for this frame (affects only its children)
+                    frame['i_or'] = current_i
+                    frame['j_or'] = current_j
+                    frame['dist'] = 0
+                    frame['n'] = 0
+                    frame['bacount'] = 0
+                    frame['bapos'] = None
+
+                # Set state to 'process_children' to begin processing children
+                frame['state'] = 'process_children'
+
+            elif state == 'process_children':
+                # Get the list of valid children and current child index
+                valid_children = frame['valid_children']
+                child_distances = frame['child_distances']
+                child_index = frame['child_index']
+
+                if child_index >= len(valid_children):
+                    # All children have been processed, pop the frame
+                    stack.pop()
+                    continue
+
+                # Get the next child to process
+                point = valid_children[child_index]
+                distance = child_distances[child_index]
+                pi, pj = point
+
+                # Increment child index in the parent frame
+                frame['child_index'] += 1
+
+                # Mark child as visited
+                A[pi, pj] = 0
+
+                # Update backup position if bacount reaches 30
+                child_bacount = frame['bacount'] + 1
+                child_bapos = frame['bapos']
+                if child_bacount == 30:
+                    child_bapos = (pi, pj)
+
+                # Update cumulative distance
+                child_dist = frame['dist'] + distance
+
+                # Create a new frame for the child node
+                child_frame = {
+                    'i': pi,
+                    'j': pj,
+                    'n': frame['n'] + 1,
+                    'i_or': frame['i_or'],
+                    'j_or': frame['j_or'],
+                    'bacount': child_bacount,
+                    'bapos': child_bapos,
+                    'dist': child_dist,
+                    'state': 'process_node'
+                }
+
+                # Push the child frame onto the stack
+                stack.append(child_frame)
+
+        return
 
     def apply_roi(self, segmentation, skeleton, zones_ABC, roi):
         """
@@ -196,6 +365,7 @@ class GeometricalVBMs:
         skeleton_roi = skeleton_roi * roi[:, :, 1] / 255
 
         return segmentation_roi, skeleton_roi
+
 
     def compute_geomVBMs(self,blood_vessel, skeleton, xc,yc, radius):
         """
@@ -270,7 +440,7 @@ class GeometricalVBMs:
             # print(t)
             i, j = idx_start
             startpoints[i, j] = 1
-            self.recursive_topology(skoustideB_reg.copy(), B, idx_start[0], idx_start[1], 1, np.inf, xc, yc, endpoints,
+            self.iterative_topology(skoustideB_reg.copy(), B, idx_start[0], idx_start[1], 1, np.inf, xc, yc, endpoints,
                             interpoints, i, j, dico, 0, None)
 
         #### Extracting the tortuosity and length using the topology of the graph
@@ -323,5 +493,46 @@ class GeometricalVBMs:
         #### Return the biomarkers as well as the particular points visualisations
         return [area, TI, medTor, ovlen, medianba, startp, endp, interp], (endpoints,interpoints,startpoints, angles_dico, dico)
 
+if __name__ == "__main__":
+    import numpy as np
+    from skimage.morphology import skeletonize
+    from PIL import Image
+    import sys
+    from PVBM.FractalAnalysis import MultifractalVBMs
 
+    sys.setrecursionlimit(100000)
+
+    center = (811,777)
+    radius = 135
+
+    blood_vessel_segmentation_path = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/lasttest/segmentation/DiscCentered_30FOV.png'
+    segmentation = np.array(Image.open(blood_vessel_segmentation_path)) / 255  # Open the segmentation
+    segmentation = segmentation[:,:,0]
+    skeleton = skeletonize(segmentation) * 1
+    vbms = GeometricalVBMs()  # Instanciate a geometrical VBM object
+
+    roi = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/lasttest/ROI/DiscCentered_30FOV.png'
+    roi = np.array(Image.open(roi))
+
+    zones_ABC = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/lasttest/zones_ABC/DiscCentered_30FOV.png'
+    zones_ABC = np.array(Image.open(zones_ABC))
+
+    segmentation, skeleton = vbms.apply_roi(
+        segmentation=segmentation,
+        skeleton=skeleton,
+        zones_ABC=zones_ABC,
+        roi = roi,
+    )
+
+    vbms, visual = vbms.compute_geomVBMs(
+        blood_vessel=segmentation,
+        skeleton=skeleton,
+        xc=center[0],
+        yc=center[1],
+        radius=radius
+    )
+
+    fractalVBMs = MultifractalVBMs(n_rotations=25, optimize=True, min_proba=0.0001, maxproba=0.9999)
+    D0, D1, D2, SL = fractalVBMs.compute_multifractals(segmentation.copy())
+    1
 

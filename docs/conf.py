@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'PVBM'
 copyright = '2023, JF'
 author = 'JF'
-release = '2.9.9.1'
+release = '2.9.9.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
