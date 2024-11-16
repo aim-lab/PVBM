@@ -9,8 +9,8 @@ long_description = read_readme("README.md")
 
 setup(
     name='pvbm',
-    version='2.9.9.2',
-    packages=find_packages(exclude=['PVBM/lunetv2_odc.onnx']),
+    version='2.9.9.3',
+    packages=find_packages(), #exclude=['PVBM/lunetv2_odc.onnx']
     install_requires=[
         "numpy",
         "scipy",
