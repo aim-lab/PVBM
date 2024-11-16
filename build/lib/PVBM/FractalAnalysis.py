@@ -165,11 +165,14 @@ class MultifractalVBMs:
 
         dqs = []
         for angle in angles:
+            print("Angle {}".format(angle))
             rotated_image = sktransform.rotate(segmentation, angle, resize=True, cval=0, mode='constant')
             dq = []
             for q in dim_list:
+                print("q {}".format(q))
                 dq_value = self.get_multi_fractal_dimension(rotated_image, q)
                 dq.append(dq_value)
+                print(dq_value)
 
             dqs.append(dq)
 
@@ -260,3 +263,46 @@ class MultifractalVBMs:
 
         return global_max_index
 
+if __name__ == "__main__":
+    import numpy as np
+    from skimage.morphology import skeletonize
+    from PIL import Image
+    import sys
+    from PVBM.FractalAnalysis import MultifractalVBMs
+    from PVBM.GeometryAnalysis import GeometricalVBMs
+
+    sys.setrecursionlimit(100000)
+
+    center = (645,822)
+    radius = 181
+
+    blood_vessel_segmentation_path = '/Users/jonathanfhima/Desktop/Lirot2025/Model2App/LirotAnalysis/testanalysis_Lirotai/segmentation/DRISHTI-GS1-test-3.png'
+    segmentation = np.array(Image.open(blood_vessel_segmentation_path)) / 255  # Open the segmentation
+    segmentation = segmentation[:,:,2]
+    skeleton = skeletonize(segmentation) * 1
+    vbms = GeometricalVBMs()  # Instanciate a geometrical VBM object
+
+    roi = '/Users/jonathanfhima/Desktop/Lirot2025/Model2App/LirotAnalysis/testanalysis_Lirotai/ROI/DRISHTI-GS1-test-3.png'
+    roi = np.array(Image.open(roi))
+
+    zones_ABC = '/Users/jonathanfhima/Desktop/Lirot2025/Model2App/LirotAnalysis/testanalysis_Lirotai/zones_ABC/DRISHTI-GS1-test-3.png'
+    zones_ABC = np.array(Image.open(zones_ABC))
+
+    segmentation, skeleton = vbms.apply_roi(
+        segmentation=segmentation,
+        skeleton=skeleton,
+        zones_ABC=zones_ABC,
+        roi = roi,
+    )
+
+    vbms, visual = vbms.compute_geomVBMs(
+        blood_vessel=segmentation,
+        skeleton=skeleton,
+        xc=center[0],
+        yc=center[1],
+        radius=radius
+    )
+
+    fractalVBMs = MultifractalVBMs(n_rotations=25, optimize=True, min_proba=0.0001, maxproba=0.9999)
+    D0, D1, D2, SL = fractalVBMs.compute_multifractals(segmentation.copy())
+    1

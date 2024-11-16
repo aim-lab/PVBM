@@ -5,12 +5,17 @@ def read_readme(file_name):
     with open(file_name, "r", encoding="utf-8") as file:
         return file.read()
 
+
 long_description = read_readme("README.md")
 
 setup(
     name='pvbm',
     version='2.9.9.3',
-    packages=find_packages(), #exclude=['PVBM/lunetv2_odc.onnx']
+    packages=find_packages(),
+    include_package_data=True,  # Ensure non-Python files are included
+    package_data={
+        "": ["*.onnx"],  # Include all .onnx files in all subdirectories
+    },
     install_requires=[
         "numpy",
         "scipy",
