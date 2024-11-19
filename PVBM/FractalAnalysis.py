@@ -165,15 +165,11 @@ class MultifractalVBMs:
 
         dqs = []
         for angle in angles:
-            print("Angle {}".format(angle))
             rotated_image = sktransform.rotate(segmentation, angle, resize=True, cval=0, mode='constant')
             dq = []
             for q in dim_list:
-                print("q {}".format(q))
                 dq_value = self.get_multi_fractal_dimension(rotated_image, q)
                 dq.append(dq_value)
-                print(dq_value)
-
             dqs.append(dq)
 
         dqs = np.array(dqs)

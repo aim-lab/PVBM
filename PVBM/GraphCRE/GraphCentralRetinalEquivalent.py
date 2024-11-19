@@ -411,7 +411,7 @@ class Tree:
                 curtree = curtree.add_children((i, j))
 
             # Exit conditions based on distance from center
-            if ((x_c - i) ** 2 + (y_c - j) ** 2) ** 0.5 > radius_zone_C:
+            if ((y_c - i) ** 2 + (x_c - j) ** 2) ** 0.5 > radius_zone_C:
                 curtree.finished((i, j))
                 continue
 

@@ -304,36 +304,36 @@ class CREVBMs:
             else:
                 return ({"craek": -1, "craeh": -1}, None)
 
-# if __name__ == "__main__":
-#     import numpy as np
-#     from skimage.morphology import skeletonize
-#     from PIL import Image
-#
-#     center = (1278,721)
-#     radius = 103
-#
-#     blood_vessel_segmentation_path = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/segmentation/DR_2_ICDR.jpg'
-#     segmentation = np.array(Image.open(blood_vessel_segmentation_path)) / 255  # Open the segmentation
-#     segmentation = segmentation[:,:,2]
-#     skeleton = skeletonize(segmentation) * 1
-#     creVBM = CREVBMs()  # Instanciate a geometrical VBM object
-#
-#     roi = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/ROI/DR_2_ICDR.jpg'
-#     roi = np.array(Image.open(roi))
-#
-#     zones_ABC = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/zones_ABC/DR_2_ICDR.jpg'
-#     zones_ABC = np.array(Image.open(zones_ABC))
-#
-#     segmentation_roi, skeleton_roi = creVBM.apply_roi(
-#         segmentation=segmentation,
-#         skeleton=skeleton,
-#         zones_ABC=zones_ABC,
-#     )
-#
-#     vbms, visual = creVBM.compute_central_retinal_equivalents(
-#         blood_vessel=segmentation_roi,
-#         skeleton=skeleton_roi,
-#         xc=center[0],
-#         yc=center[1],
-#         radius=radius
-#     )
+if __name__ == "__main__":
+    import numpy as np
+    from skimage.morphology import skeletonize
+    from PIL import Image
+
+    center = (460,689)
+    radius = 110
+
+    blood_vessel_segmentation_path = '/Users/jonathanfhima/Desktop/test123/segmentation/seg.png'
+    segmentation = np.array(Image.open(blood_vessel_segmentation_path)) / 255  # Open the segmentation
+    segmentation = segmentation[:,:,2]
+    skeleton = skeletonize(segmentation) * 1
+    creVBM = CREVBMs()  # Instanciate a geometrical VBM object
+
+    #roi = '/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/ROI/DR_2_ICDR.jpg'
+    #roi = np.array(Image.open(roi))
+
+    zones_ABC = '/Users/jonathanfhima/Desktop/test123/zones_ABC/zones.jpg'
+    zones_ABC = np.array(Image.open(zones_ABC))
+
+    segmentation_roi, skeleton_roi = creVBM.apply_roi(
+        segmentation=segmentation,
+        skeleton=skeleton,
+        zones_ABC=zones_ABC,
+    )
+
+    vbms, visual = creVBM.compute_central_retinal_equivalents(
+        blood_vessel=segmentation_roi,
+        skeleton=skeleton_roi,
+        xc=center[0],
+        yc=center[1],
+        radius=radius
+    )

@@ -10,7 +10,7 @@ long_description = read_readme("README.md")
 
 setup(
     name='pvbm',
-    version='2.9.9.3',
+    version='2.9.9.5',
     packages=find_packages(),
     include_package_data=True,  # Ensure non-Python files are included
     package_data={
@@ -24,7 +24,8 @@ setup(
         "gdown",
         "onnxruntime",
         "torchvision",
-        "opencv-python"
+        "opencv-python",
+        "matplotlib"
     ],
     author='Jonathan Fhima, Yevgeniy Men',
     author_email='jonathanfh@campus.technion.ac.il',
