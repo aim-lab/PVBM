@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PVBM.GeometryAnalysis &mdash; PVBM 3.0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PVBM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DiscSegmenter.html">DiscSegmenter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LesionSegmenter.html">LesionSegmenter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GeometryAnalysis.html">GeometryAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../FractalAnalysis.html">FractalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CentralRetinalAnalysis.html">CentralRetinalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pvbmtutorial.html">PVBM Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PVBM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">PVBM.GeometryAnalysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for PVBM.GeometryAnalysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">convolve2d</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.tortuosity</span> <span class="kn">import</span> <span class="n">compute_tortuosity</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.perimeter</span> <span class="kn">import</span> <span class="n">compute_perimeter_</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.branching_angle</span> <span class="kn">import</span> <span class="n">compute_angles_dictionary</span>
+<span class="c1">#from PVBM.helpers.far import far</span>
+<span class="kn">from</span> <span class="nn">PVBM.GraphRegularisation.GraphRegularisation</span> <span class="kn">import</span> <span class="n">TreeReg</span>
+<div class="viewcode-block" id="GeometricalVBMs"><a class="viewcode-back" href="../../GeometryAnalysis.html#PVBM.GeometryAnalysis.GeometricalVBMs">[docs]</a><span class="k">class</span> <span class="nc">GeometricalVBMs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class that can perform geometrical biomarker computation for a fundus image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">extract_subgraphs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">graphs</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract B, the a graph where each of the disconnected subgraph is labeled differently and D which contains the euclidian distance graph between each</span>
+<span class="sd">        point in the graph and the optic disc.</span>
+
+<span class="sd">        :param graphs: Original blood vessel segmentation graph</span>
+<span class="sd">        :type graphs: array</span>
+<span class="sd">        :param x_c: x axis of the optic disc center</span>
+<span class="sd">        :type x_c: int</span>
+<span class="sd">        :param y_c: y axis of the optic disc center</span>
+<span class="sd">        :type y_c: int</span>
+
+<span class="sd">        :return: B,D</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">graphs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">graphs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">graphs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">recursive_subgraph</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">)</span>
+                    <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span>
+
+    <span class="k">def</span> <span class="nf">recursive_subgraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively extract the value within B and D.</span>
+
+<span class="sd">        :param A: Original blood vessel segmentation graph</span>
+<span class="sd">        :type A: array</span>
+<span class="sd">        :param B: A graph where each of the disconnected subgraph is labeled differentl, which is initialized by a zeros matrix and recursively built</span>
+<span class="sd">        :type B: array</span>
+<span class="sd">        :param D: Euclidian Distance graph between each point in A and the optic disc center (x_c,y_c), which is initialized by a zeros matrix and recursively built</span>
+<span class="sd">        :type D: array</span>
+<span class="sd">        :param i: Current x axis location within the graph</span>
+<span class="sd">        :type i: int</span>
+<span class="sd">        :param j: Current y axis location within the graph</span>
+<span class="sd">        :type j: int</span>
+<span class="sd">        :param n: Current number of point distance since the optic disc</span>
+<span class="sd">        :type n: int</span>
+<span class="sd">        :param x_c: x axis of the optic disc center</span>
+<span class="sd">        :type x_c: int</span>
+<span class="sd">        :param y_c: y axis of the optic disc center</span>
+<span class="sd">        :type y_c: int</span>
+
+<span class="sd">        :return: B,D</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">up_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">up_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">down_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">down_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">up</span><span class="p">,</span> <span class="n">down</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">up_left</span><span class="p">,</span> <span class="n">up_right</span><span class="p">,</span> <span class="n">down_left</span><span class="p">,</span> <span class="n">down_right</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">A</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">B</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+                    <span class="n">A</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">D</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">y_c</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">x_c</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">recursive_subgraph</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">)</span>
+
+    <span class="c1"># def recursive_topology(self,A, B, i, j, n, max_radius, x_c, y_c, endpoints, interpoints, i_or, j_or, dico, bacount, bapos,</span>
+    <span class="c1">#                     dist=0):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Recursively compute and analyze the topology of a segmented image.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     This function traverses a segmented image to identify endpoints and intersection points of a structure, and</span>
+    <span class="c1">#     calculates various distance metrics. The results are stored in a dictionary for further analysis.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     :param A: The array representing the binary segmentation of the structure.</span>
+    <span class="c1">#     :type A: np.array</span>
+    <span class="c1">#     :param B: An auxiliary array used for processing.</span>
+    <span class="c1">#     :type B: np.array</span>
+    <span class="c1">#     :param i: The current x-coordinate.</span>
+    <span class="c1">#     :type i: int</span>
+    <span class="c1">#     :param j: The current y-coordinate.</span>
+    <span class="c1">#     :type j: int</span>
+    <span class="c1">#     :param n: The current recursion depth.</span>
+    <span class="c1">#     :type n: int</span>
+    <span class="c1">#     :param max_radius: The maximum allowed radius for the traversal.</span>
+    <span class="c1">#     :type max_radius: float</span>
+    <span class="c1">#     :param x_c: The x-coordinate of the center of the structure.</span>
+    <span class="c1">#     :type x_c: int</span>
+    <span class="c1">#     :param y_c: The y-coordinate of the center of the structure.</span>
+    <span class="c1">#     :type y_c: int</span>
+    <span class="c1">#     :param endpoints: The array to mark endpoints of the structure.</span>
+    <span class="c1">#     :type endpoints: np.array</span>
+    <span class="c1">#     :param interpoints: The array to mark intersection points of the structure.</span>
+    <span class="c1">#     :type interpoints: np.array</span>
+    <span class="c1">#     :param i_or: The original x-coordinate of the starting point.</span>
+    <span class="c1">#     :type i_or: int</span>
+    <span class="c1">#     :param j_or: The original y-coordinate of the starting point.</span>
+    <span class="c1">#     :type j_or: int</span>
+    <span class="c1">#     :param dico: A dictionary to store computed distance metrics.</span>
+    <span class="c1">#     :type dico: dict</span>
+    <span class="c1">#     :param bacount: A counter to track the number of recursive steps.</span>
+    <span class="c1">#     :type bacount: int</span>
+    <span class="c1">#     :param bapos: The backup position for the traversal.</span>
+    <span class="c1">#     :type bapos: tuple or None</span>
+    <span class="c1">#     :param dist: The cumulative distance of the traversal.</span>
+    <span class="c1">#     :type dist: float</span>
+    <span class="c1">#</span>
+    <span class="c1">#     :return: None</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     up = (i - 1, j)</span>
+    <span class="c1">#     down = (i + 1, j)</span>
+    <span class="c1">#     left = (i, j - 1)</span>
+    <span class="c1">#     right = (i, j + 1)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     up_left = (i - 1, j - 1)</span>
+    <span class="c1">#     up_right = (i - 1, j + 1)</span>
+    <span class="c1">#     down_left = (i + 1, j - 1)</span>
+    <span class="c1">#     down_right = (i + 1, j + 1)</span>
+    <span class="c1">#     points = [up, down, left, right, up_left, up_right, down_left, down_right]</span>
+    <span class="c1">#     children = np.sum([A[point] for point in points])</span>
+    <span class="c1">#     distances = [1, 1, 1, 1, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5, 2 ** 0.5]</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # print(f&quot;Processing node: i={i}, j={j}, i_or={i_or}, j_or={j_or}, dist={dist},n={n} \n&quot;)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if ((y_c - i) ** 2 + (</span>
+    <span class="c1">#             x_c - j) ** 2) ** 0.5 &gt; max_radius:  # and np.mean(curtree.diameter_list)*6 &lt;= 80  and ultimatum == False:</span>
+    <span class="c1">#         endpoints[i, j] = 1</span>
+    <span class="c1">#         true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5</span>
+    <span class="c1">#         dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)</span>
+    <span class="c1">#         return</span>
+    <span class="c1">#</span>
+    <span class="c1">#     elif children == 0 and n &gt;= 10:</span>
+    <span class="c1">#         endpoints[i, j] = 1</span>
+    <span class="c1">#         true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5</span>
+    <span class="c1">#         dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)</span>
+    <span class="c1">#         i_or, j_or = i, j</span>
+    <span class="c1">#         dist = 0</span>
+    <span class="c1">#         return</span>
+    <span class="c1">#</span>
+    <span class="c1">#     elif children &gt; 1 and n &gt;= 10:</span>
+    <span class="c1">#         interpoints[i, j] = 1</span>
+    <span class="c1">#         true_dist = ((i_or - i) ** 2 + (j_or - j) ** 2) ** 0.5</span>
+    <span class="c1">#         dico[(i_or, j_or, i, j)] = (dist, true_dist, true_dist / dist, bapos)</span>
+    <span class="c1">#         i_or, j_or = i, j</span>
+    <span class="c1">#         dist = 0</span>
+    <span class="c1">#         n = 0</span>
+    <span class="c1">#         bacount = 0</span>
+    <span class="c1">#         bapos = None</span>
+    <span class="c1">#     for point, distance in zip(points, distances):</span>
+    <span class="c1">#         if point[0] &gt;= 0 and point[0] &lt; B.shape[0] and point[1] &lt; B.shape[1] and point[1] &gt;= 0:</span>
+    <span class="c1">#             if A[point] == 1:</span>
+    <span class="c1">#                 A[point] = 0</span>
+    <span class="c1">#                 if bacount == 30:</span>
+    <span class="c1">#                     bapos = point</span>
+    <span class="c1">#                     # print(&quot;update bapos&quot;,bapos)</span>
+    <span class="c1">#                     # print(i_or,j_or)</span>
+    <span class="c1">#                 self.recursive_topology(A, B, point[0], point[1], n + 1, max_radius, x_c, y_c, endpoints, interpoints, i_or,</span>
+    <span class="c1">#                                 j_or, dico, bacount + 1, bapos, distance + dist)</span>
+
+    <span class="c1">#Moved to iterative because recursive leads to stack overflow in c</span>
+    <span class="k">def</span> <span class="nf">iterative_topology</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">max_radius</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">,</span> <span class="n">endpoints</span><span class="p">,</span> <span class="n">interpoints</span><span class="p">,</span>
+            <span class="n">i_or</span><span class="p">,</span> <span class="n">j_or</span><span class="p">,</span> <span class="n">dico</span><span class="p">,</span> <span class="n">bacount</span><span class="p">,</span> <span class="n">bapos</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iteratively compute and analyze the topology of a segmented image using a stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize the stack with the initial node&#39;s state</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">initial_frame</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span>
+            <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="n">j</span><span class="p">,</span>
+            <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+            <span class="s1">&#39;i_or&#39;</span><span class="p">:</span> <span class="n">i_or</span><span class="p">,</span>
+            <span class="s1">&#39;j_or&#39;</span><span class="p">:</span> <span class="n">j_or</span><span class="p">,</span>
+            <span class="s1">&#39;bacount&#39;</span><span class="p">:</span> <span class="n">bacount</span><span class="p">,</span>
+            <span class="s1">&#39;bapos&#39;</span><span class="p">:</span> <span class="n">bapos</span><span class="p">,</span>
+            <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="n">dist</span><span class="p">,</span>
+            <span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="s1">&#39;process_node&#39;</span>  <span class="c1"># Possible states: &#39;process_node&#39;, &#39;process_children&#39;</span>
+        <span class="p">}</span>
+        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initial_frame</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Mark the starting node as visited</span>
+
+        <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="c1"># Peek at the last frame on the stack</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">current_i</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">]</span>
+            <span class="n">current_j</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;j&#39;</span><span class="p">]</span>
+            <span class="n">current_n</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
+            <span class="n">current_i_or</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;i_or&#39;</span><span class="p">]</span>
+            <span class="n">current_j_or</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;j_or&#39;</span><span class="p">]</span>
+            <span class="n">current_bacount</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;bacount&#39;</span><span class="p">]</span>
+            <span class="n">current_bapos</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;bapos&#39;</span><span class="p">]</span>
+            <span class="n">current_dist</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;process_node&#39;</span><span class="p">:</span>
+                <span class="c1"># print(</span>
+                <span class="c1">#     f&quot;Processing node: i={current_i}, j={current_j}, i_or={current_i_or}, j_or={current_j_or}, dist={current_dist},n={current_n} \n&quot;)</span>
+
+                <span class="c1"># Calculate the Euclidean distance from the center</span>
+                <span class="n">distance_from_center</span> <span class="o">=</span> <span class="p">((</span><span class="n">y_c</span> <span class="o">-</span> <span class="n">current_i</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">x_c</span> <span class="o">-</span> <span class="n">current_j</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+                <span class="c1"># Base Case 1: If beyond the allowed radius</span>
+                <span class="k">if</span> <span class="n">distance_from_center</span> <span class="o">&gt;</span> <span class="n">max_radius</span><span class="p">:</span>
+                    <span class="n">endpoints</span><span class="p">[</span><span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">true_distance</span> <span class="o">=</span> <span class="p">((</span><span class="n">current_i_or</span> <span class="o">-</span> <span class="n">current_i</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">current_j_or</span> <span class="o">-</span> <span class="n">current_j</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+                    <span class="n">dico</span><span class="p">[(</span><span class="n">current_i_or</span><span class="p">,</span> <span class="n">current_j_or</span><span class="p">,</span> <span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">current_dist</span><span class="p">,</span>
+                        <span class="n">true_distance</span><span class="p">,</span>
+                        <span class="n">true_distance</span> <span class="o">/</span> <span class="n">current_dist</span> <span class="k">if</span> <span class="n">current_dist</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span>
+                        <span class="n">current_bapos</span>
+                    <span class="p">)</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>  <span class="c1"># Remove frame from stack</span>
+                    <span class="k">continue</span>  <span class="c1"># Proceed to next frame</span>
+
+                <span class="c1"># Define all 8 neighbors and their corresponding distances</span>
+                <span class="n">up</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_j</span><span class="p">)</span>
+                <span class="n">down</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_j</span><span class="p">)</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">up_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">up_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">down_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">down_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">up</span><span class="p">,</span> <span class="n">down</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">up_left</span><span class="p">,</span> <span class="n">up_right</span><span class="p">,</span> <span class="n">down_left</span><span class="p">,</span> <span class="n">down_right</span><span class="p">]</span>
+                <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">]</span>
+
+                <span class="c1"># Compute the number of children</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">valid_children</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">child_distances</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">point</span><span class="p">,</span> <span class="n">distance</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">distances</span><span class="p">):</span>
+                    <span class="n">pi</span><span class="p">,</span> <span class="n">pj</span> <span class="o">=</span> <span class="n">point</span>
+                    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">pi</span> <span class="o">&lt;</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">pj</span> <span class="o">&lt;</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">A</span><span class="p">[</span><span class="n">pi</span><span class="p">,</span> <span class="n">pj</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">children</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="n">valid_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+                            <span class="n">child_distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+
+                <span class="c1"># Store valid children and distances in the frame</span>
+                <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;valid_children&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_children</span>
+                <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;child_distances&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">child_distances</span>
+                <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;child_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Index of next child to process</span>
+
+                <span class="c1"># Base Case 2: No children and sufficient depth</span>
+                <span class="k">if</span> <span class="n">children</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_n</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+                    <span class="n">endpoints</span><span class="p">[</span><span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">true_distance</span> <span class="o">=</span> <span class="p">((</span><span class="n">current_i_or</span> <span class="o">-</span> <span class="n">current_i</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">current_j_or</span> <span class="o">-</span> <span class="n">current_j</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+                    <span class="n">dico</span><span class="p">[(</span><span class="n">current_i_or</span><span class="p">,</span> <span class="n">current_j_or</span><span class="p">,</span> <span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">current_dist</span><span class="p">,</span>
+                        <span class="n">true_distance</span><span class="p">,</span>
+                        <span class="n">true_distance</span> <span class="o">/</span> <span class="n">current_dist</span> <span class="k">if</span> <span class="n">current_dist</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span>
+                        <span class="n">current_bapos</span>
+                    <span class="p">)</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>  <span class="c1"># Remove frame from stack</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Base Case 3: More than one child and sufficient depth</span>
+                <span class="k">if</span> <span class="n">children</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">current_n</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+                    <span class="n">interpoints</span><span class="p">[</span><span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">true_distance</span> <span class="o">=</span> <span class="p">((</span><span class="n">current_i_or</span> <span class="o">-</span> <span class="n">current_i</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">current_j_or</span> <span class="o">-</span> <span class="n">current_j</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+                    <span class="n">dico</span><span class="p">[(</span><span class="n">current_i_or</span><span class="p">,</span> <span class="n">current_j_or</span><span class="p">,</span> <span class="n">current_i</span><span class="p">,</span> <span class="n">current_j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">current_dist</span><span class="p">,</span>
+                        <span class="n">true_distance</span><span class="p">,</span>
+                        <span class="n">true_distance</span> <span class="o">/</span> <span class="n">current_dist</span> <span class="k">if</span> <span class="n">current_dist</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span>
+                        <span class="n">current_bapos</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Reset variables for this frame (affects only its children)</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;i_or&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_i</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;j_or&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_j</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;bacount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;bapos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="c1"># Set state to &#39;process_children&#39; to begin processing children</span>
+                <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;process_children&#39;</span>
+
+            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;process_children&#39;</span><span class="p">:</span>
+                <span class="c1"># Get the list of valid children and current child index</span>
+                <span class="n">valid_children</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;valid_children&#39;</span><span class="p">]</span>
+                <span class="n">child_distances</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;child_distances&#39;</span><span class="p">]</span>
+                <span class="n">child_index</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;child_index&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">child_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_children</span><span class="p">):</span>
+                    <span class="c1"># All children have been processed, pop the frame</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Get the next child to process</span>
+                <span class="n">point</span> <span class="o">=</span> <span class="n">valid_children</span><span class="p">[</span><span class="n">child_index</span><span class="p">]</span>
+                <span class="n">distance</span> <span class="o">=</span> <span class="n">child_distances</span><span class="p">[</span><span class="n">child_index</span><span class="p">]</span>
+                <span class="n">pi</span><span class="p">,</span> <span class="n">pj</span> <span class="o">=</span> <span class="n">point</span>
+
+                <span class="c1"># Increment child index in the parent frame</span>
+                <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;child_index&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Mark child as visited</span>
+                <span class="n">A</span><span class="p">[</span><span class="n">pi</span><span class="p">,</span> <span class="n">pj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="c1"># Update backup position if bacount reaches 30</span>
+                <span class="n">child_bacount</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;bacount&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">child_bapos</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;bapos&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">child_bacount</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+                    <span class="n">child_bapos</span> <span class="o">=</span> <span class="p">(</span><span class="n">pi</span><span class="p">,</span> <span class="n">pj</span><span class="p">)</span>
+
+                <span class="c1"># Update cumulative distance</span>
+                <span class="n">child_dist</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">distance</span>
+
+                <span class="c1"># Create a new frame for the child node</span>
+                <span class="n">child_frame</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="n">pi</span><span class="p">,</span>
+                    <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="n">pj</span><span class="p">,</span>
+                    <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s1">&#39;i_or&#39;</span><span class="p">:</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;i_or&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;j_or&#39;</span><span class="p">:</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;j_or&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;bacount&#39;</span><span class="p">:</span> <span class="n">child_bacount</span><span class="p">,</span>
+                    <span class="s1">&#39;bapos&#39;</span><span class="p">:</span> <span class="n">child_bapos</span><span class="p">,</span>
+                    <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="n">child_dist</span><span class="p">,</span>
+                    <span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="s1">&#39;process_node&#39;</span>
+                <span class="p">}</span>
+
+                <span class="c1"># Push the child frame onto the stack</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_frame</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="GeometricalVBMs.apply_roi"><a class="viewcode-back" href="../../GeometryAnalysis.html#PVBM.GeometryAnalysis.GeometricalVBMs.apply_roi">[docs]</a>    <span class="k">def</span> <span class="nf">apply_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segmentation</span><span class="p">,</span> <span class="n">skeleton</span><span class="p">,</span> <span class="n">zones_ABC</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a region of interest (ROI) mask to the segmentation and skeleton images.</span>
+
+<span class="sd">        :param segmentation: The segmentation image containing binary values within {0, 1}.</span>
+<span class="sd">        :type segmentation: np.array</span>
+<span class="sd">        :param skeleton: The skeleton image containing binary values within {0, 1}.</span>
+<span class="sd">        :type skeleton: np.array</span>
+<span class="sd">        :param zones_ABC: A mask image used to exclude specific zones, where the second channel defines the exclusion areas.</span>
+<span class="sd">        :type zones_ABC: np.array</span>
+<span class="sd">        :param roi: The region of interest mask, where the second channel defines the ROI areas.</span>
+<span class="sd">        :type roi: np.array</span>
+
+<span class="sd">        :return: A tuple containing:</span>
+<span class="sd">            - The modified segmentation image with the ROI applied.</span>
+<span class="sd">            - The modified skeleton image with the ROI applied.</span>
+<span class="sd">        :rtype: Tuple[np.array, np.array]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">segmentation_roi</span> <span class="o">=</span> <span class="n">segmentation</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">zones_ABC</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="n">segmentation_roi</span> <span class="o">=</span> <span class="n">segmentation_roi</span> <span class="o">*</span> <span class="n">roi</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>
+
+        <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="n">skeleton</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">zones_ABC</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="n">skeleton_roi</span> <span class="o">*</span> <span class="n">roi</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>
+
+        <span class="k">return</span> <span class="n">segmentation_roi</span><span class="p">,</span> <span class="n">skeleton_roi</span></div>
+
+
+<div class="viewcode-block" id="GeometricalVBMs.compute_geomVBMs"><a class="viewcode-back" href="../../GeometryAnalysis.html#PVBM.GeometryAnalysis.GeometricalVBMs.compute_geomVBMs">[docs]</a>    <span class="k">def</span> <span class="nf">compute_geomVBMs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">blood_vessel</span><span class="p">,</span> <span class="n">skeleton</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute various geometrical vascular biomarkers (VBMs) for a given blood vessel graph.</span>
+
+<span class="sd">        This function analyzes the blood vessel segmentation and skeleton to extract several biomarkers such as area,</span>
+<span class="sd">        tortuosity index, median tortuosity, overall length, median branching angle, and counts of start, end, and</span>
+<span class="sd">        intersection points. It also provides visualizations of specific points on the graph.</span>
+
+<span class="sd">        :param blood_vessel: Blood vessel segmentation containing binary values within {0,1}.</span>
+<span class="sd">        :type blood_vessel: np.array</span>
+<span class="sd">        :param skeleton: Blood vessel segmentation skeleton containing binary values within {0,1}.</span>
+<span class="sd">        :type skeleton: np.array</span>
+<span class="sd">        :param xc: X-axis coordinate of the optic disc center.</span>
+<span class="sd">        :type xc: int</span>
+<span class="sd">        :param yc: Y-axis coordinate of the optic disc center.</span>
+<span class="sd">        :type yc: int</span>
+<span class="sd">        :param radius: Radius in pixels of the optic disc.</span>
+<span class="sd">        :type radius: int</span>
+
+<span class="sd">        :return: A tuple containing:</span>
+<span class="sd">            - A list of biomarkers [area, tortuosity index, median tortuosity, overall length, median branching angle, number of start points, number of end points, number of intersection points].</span>
+<span class="sd">            - A tuple of visualizations (endpoints, interpoints, startpoints, angles_dico, dico).</span>
+<span class="sd">        :rtype: Tuple[list, tuple]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">####Compute the area</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">blood_vessel</span><span class="p">)</span>
+
+
+        <span class="c1">## Extract the distances graphs</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_subgraphs</span><span class="p">(</span><span class="n">graphs</span><span class="o">=</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">x_c</span><span class="o">=</span><span class="n">xc</span><span class="p">,</span> <span class="n">y_c</span><span class="o">=</span><span class="n">yc</span><span class="p">)</span>
+
+        <span class="c1">## Extract the starting points list by navigating through the skeleton graph</span>
+        <span class="n">starting_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">skeleton</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skeleton</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> <span class="o">-</span> <span class="p">{</span><span class="mi">0</span><span class="p">}:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">B</span> <span class="o">==</span> <span class="n">i</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">:</span>
+                <span class="n">min_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">D</span> <span class="o">*</span> <span class="n">mask</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mask</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e10</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                <span class="n">min_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">min_index</span><span class="p">,</span> <span class="n">D</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="c1"># print(((min_coordinates[0] - yc)**2 + (min_coordinates[1] - xc)**2)**0.5)</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">min_coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">yc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">min_coordinates</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">radius</span><span class="p">:</span>
+                    <span class="n">starting_points</span><span class="p">[</span><span class="n">min_coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_coordinates</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">starting_point_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">starting_points</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="c1">### Cleaning the skeleton graph irregularities</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">tree_reg_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">idx_start</span> <span class="ow">in</span> <span class="n">starting_point_list</span><span class="p">:</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">TreeReg</span><span class="p">(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">recursive_reg</span><span class="p">(</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">plot</span><span class="p">)</span>
+            <span class="n">tree_reg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+        <span class="n">plot_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tree_reg</span> <span class="ow">in</span> <span class="n">tree_reg_list</span><span class="p">:</span>
+            <span class="n">plot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">tree_reg</span><span class="o">.</span><span class="n">print_reg</span><span class="p">(</span><span class="n">tree_reg</span><span class="p">,</span> <span class="n">plot</span><span class="p">)</span>
+            <span class="n">plot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">skoustideB_reg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">plot_list</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#####Initialise the endpoints, interpoints and startpoints array that will be used later for visualization</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">interpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">startpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1">#####Initialising a dictionary that will be used to store the topology of th graph</span>
+        <span class="n">dico</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1">####Navigating through the graph to fill the end,inter and startpoints array and the topology dico</span>
+        <span class="k">for</span> <span class="n">idx_start</span> <span class="ow">in</span> <span class="n">starting_point_list</span><span class="p">:</span>
+            <span class="c1"># print(&quot;new index&quot;)</span>
+            <span class="c1"># print(t)</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx_start</span>
+            <span class="n">startpoints</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iterative_topology</span><span class="p">(</span><span class="n">skoustideB_reg</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">endpoints</span><span class="p">,</span>
+                            <span class="n">interpoints</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dico</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1">#### Extracting the tortuosity and length using the topology of the graph</span>
+        <span class="n">chord_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dico</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+        <span class="n">arc_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dico</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+        <span class="n">TI</span> <span class="o">=</span> <span class="n">arc_list</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">chord_list</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">medTor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">arc_list</span> <span class="o">/</span> <span class="n">chord_list</span><span class="p">)</span>
+        <span class="n">ovlen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">arc_list</span><span class="p">)</span>
+
+        <span class="c1">####Filtering the potential double angles for the branching angles computations</span>
+        <span class="n">angles_dico</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">dico</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dico</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">element</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="n">angles_dico</span><span class="p">[(</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">angles_dico</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+
+        <span class="c1">####Storing all the branching angles value</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">angles_dico</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">a</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)):</span>
+                    <span class="n">ba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="n">bc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="n">cosine_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ba</span><span class="p">,</span> <span class="n">bc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ba</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">bc</span><span class="p">))</span>
+                    <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cosine_angle</span><span class="p">)</span>
+                    <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)):</span>
+                    <span class="n">ba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="n">bc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="n">cosine_angle_ac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ba</span><span class="p">,</span> <span class="n">bc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ba</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">bc</span><span class="p">))</span>
+                    <span class="n">angle_ac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cosine_angle_ac</span><span class="p">)</span>
+                    <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">angle_ac</span><span class="p">))</span>
+
+                    <span class="n">bc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="n">bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="n">cosine_angle_cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span> <span class="n">bd</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">bd</span><span class="p">))</span>
+                    <span class="n">angle_cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cosine_angle_cd</span><span class="p">)</span>
+                    <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">angle_cd</span><span class="p">))</span>
+
+        <span class="c1">####Computing the median branching angles, the number of start/inter/endpoints</span>
+        <span class="n">medianba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+        <span class="n">startp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">starting_point_list</span><span class="p">)</span>
+        <span class="n">endp</span> <span class="o">=</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">interp</span> <span class="o">=</span> <span class="n">interpoints</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1">#### Return the biomarkers as well as the particular points visualisations</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">area</span><span class="p">,</span> <span class="n">TI</span><span class="p">,</span> <span class="n">medTor</span><span class="p">,</span> <span class="n">ovlen</span><span class="p">,</span> <span class="n">medianba</span><span class="p">,</span> <span class="n">startp</span><span class="p">,</span> <span class="n">endp</span><span class="p">,</span> <span class="n">interp</span><span class="p">],</span> <span class="p">(</span><span class="n">endpoints</span><span class="p">,</span><span class="n">interpoints</span><span class="p">,</span><span class="n">startpoints</span><span class="p">,</span> <span class="n">angles_dico</span><span class="p">,</span> <span class="n">dico</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+    <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="kn">from</span> <span class="nn">PVBM.FractalAnalysis</span> <span class="kn">import</span> <span class="n">MultifractalVBMs</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="mi">811</span><span class="p">,</span><span class="mi">777</span><span class="p">)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mi">135</span>
+
+    <span class="n">blood_vessel_segmentation_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/lasttest/segmentation/DiscCentered_30FOV.png&#39;</span>
+    <span class="n">segmentation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blood_vessel_segmentation_path</span><span class="p">))</span> <span class="o">/</span> <span class="mi">255</span>  <span class="c1"># Open the segmentation</span>
+    <span class="n">segmentation</span> <span class="o">=</span> <span class="n">segmentation</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">segmentation</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
+    <span class="n">vbms</span> <span class="o">=</span> <span class="n">GeometricalVBMs</span><span class="p">()</span>  <span class="c1"># Instanciate a geometrical VBM object</span>
+
+    <span class="n">roi</span> <span class="o">=</span> <span class="s1">&#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/lasttest/ROI/DiscCentered_30FOV.png&#39;</span>
+    <span class="n">roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">roi</span><span class="p">))</span>
+
+    <span class="n">zones_ABC</span> <span class="o">=</span> <span class="s1">&#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/lasttest/zones_ABC/DiscCentered_30FOV.png&#39;</span>
+    <span class="n">zones_ABC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">zones_ABC</span><span class="p">))</span>
+
+    <span class="n">segmentation</span><span class="p">,</span> <span class="n">skeleton</span> <span class="o">=</span> <span class="n">vbms</span><span class="o">.</span><span class="n">apply_roi</span><span class="p">(</span>
+        <span class="n">segmentation</span><span class="o">=</span><span class="n">segmentation</span><span class="p">,</span>
+        <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton</span><span class="p">,</span>
+        <span class="n">zones_ABC</span><span class="o">=</span><span class="n">zones_ABC</span><span class="p">,</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">vbms</span><span class="p">,</span> <span class="n">visual</span> <span class="o">=</span> <span class="n">vbms</span><span class="o">.</span><span class="n">compute_geomVBMs</span><span class="p">(</span>
+        <span class="n">blood_vessel</span><span class="o">=</span><span class="n">segmentation</span><span class="p">,</span>
+        <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton</span><span class="p">,</span>
+        <span class="n">xc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">yc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">radius</span><span class="o">=</span><span class="n">radius</span>
+    <span class="p">)</span>
+
+    <span class="n">fractalVBMs</span> <span class="o">=</span> <span class="n">MultifractalVBMs</span><span class="p">(</span><span class="n">n_rotations</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_proba</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">maxproba</span><span class="o">=</span><span class="mf">0.9999</span><span class="p">)</span>
+    <span class="n">D0</span><span class="p">,</span> <span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">,</span> <span class="n">SL</span> <span class="o">=</span> <span class="n">fractalVBMs</span><span class="o">.</span><span class="n">compute_multifractals</span><span class="p">(</span><span class="n">segmentation</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="mi">1</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, JF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation &mdash; PVBM 3.0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Datasets" href="Datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            PVBM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiscSegmenter.html">DiscSegmenter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LesionSegmenter.html">LesionSegmenter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GeometryAnalysis.html">GeometryAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FractalAnalysis.html">FractalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CentralRetinalAnalysis.html">CentralRetinalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pvbmtutorial.html">PVBM Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">PVBM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <a class="reference external image-reference" href="https://pepy.tech/project/pvbm"><img alt="https://static.pepy.tech/badge/pvbm" src="https://static.pepy.tech/badge/pvbm" /></a>
+<a class="reference external image-reference" href="https://arxiv.org/abs/2208.00392"><img alt="https://img.shields.io/badge/arXiv-2208.00392-red" src="https://img.shields.io/badge/arXiv-2208.00392-red" /></a>
+<a class="reference external image-reference" href="https://pvbm.readthedocs.io/en/latest/"><img alt="https://img.shields.io/badge/docs-latest-brightgreen" src="https://img.shields.io/badge/docs-latest-brightgreen" /></a>
+<a class="reference external image-reference" href="https://pypi.org/project/pvbm/"><img alt="https://img.shields.io/pypi/v/pvbm.svg?color=orange" src="https://img.shields.io/pypi/v/pvbm.svg?color=orange" /></a>
+<a class="reference external image-reference" href="https://github.com/aim-lab/PVBM"><img alt="https://img.shields.io/badge/github-repo-lightgrey" src="https://img.shields.io/badge/github-repo-lightgrey" /></a>
+<a class="reference external image-reference" href="https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb"><img alt="https://img.shields.io/badge/tutorial-GitHub-purple" src="https://img.shields.io/badge/tutorial-GitHub-purple" /></a>
+<a class="reference external image-reference" href="https://apps.apple.com/fr/app/lirot-ai/id6478242092"><img alt="https://img.shields.io/badge/Download_on_the-App_Store-teal.svg" src="https://img.shields.io/badge/Download_on_the-App_Store-teal.svg" /></a>
+<section id="pvbm-a-python-vasculature-biomarker-toolbox-based-on-retinal-blood-vessel-segmentation">
+<h1>PVBM: A Python Vasculature Biomarker Toolbox Based on Retinal Blood Vessel Segmentation<a class="headerlink" href="#pvbm-a-python-vasculature-biomarker-toolbox-based-on-retinal-blood-vessel-segmentation" title="Permalink to this heading"></a></h1>
+<p>Jonathan Fhima • Jan Van Eijgen • Ingeborg Stalmans • Yevgeniy Men • Moti Freiman • Joachim A. Behar</p>
+<img alt="Pipeline" src="_images/pipeline.png" />
+<div class="toctree-wrapper compound">
+</div>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>Available on pip. Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pvbm
+</pre></div>
+</div>
+</section>
+<section id="vasculature-biomarkers">
+<h2>Vasculature Biomarkers<a class="headerlink" href="#vasculature-biomarkers" title="Permalink to this heading"></a></h2>
+<p>Digital fundus images are specialized photographs of the interior surface of the eye, capturing detailed views of the retina, including blood vessels, the optic disc, and the macula. They are invaluable tools in ophthalmology and optometry for diagnosing and monitoring various ocular diseases, including diabetic retinopathy, glaucoma, and macular degeneration.</p>
+<p>The fundus image allows for the visualization of numerous vascular features, notably the arterioles (small arteries) and venules (small veins). Advanced image processing and machine learning techniques now enable the extraction of arterioles and venules from fundus images, a process known as A/V segmentation. By isolating these vessels, we can examine their morphology and distribution in greater detail, revealing subtle changes that might otherwise go unnoticed.</p>
+<p>From this A/V segmentation, we can compute vasculature biomarkers, which are quantifiable indicators of biological states or conditions. By analyzing these vasculature biomarkers, healthcare professionals can gain deeper insights into a patient’s ocular health and potentially detect early signs of disease. This approach represents a promising frontier in eye care, allowing for more proactive and personalized treatment strategies.</p>
+<p>Fifteen biomarkers have been engineered independently on the arterioles and venules segmentation, namely:</p>
+<ul class="simple">
+<li><p><strong>Area</strong>: Area of the blood vessels computed by summing the number of pixels within the segmented arteriole or venule regions. Expressed in square pixels.</p></li>
+<li><p><strong>Length</strong>: Cumulative length of the segmented blood vessels, calculated as the distance required to traverse the entire skeleton. Expressed in pixels.</p></li>
+<li><p><strong>Tortuosity Index</strong>: Tortuosity measure based on the overall arc-chord ratio.</p></li>
+<li><p><strong>Median Tortuosity</strong>: Median value of the per-vessel tortuosity, computed using the arc-chord ratio.</p></li>
+<li><p><strong>Number of Startpoints</strong>: Number of skeleton points situated on the optic disc, representing vessel start points.</p></li>
+<li><p><strong>Number of Endpoints</strong>: Number of skeleton points terminating the blood vessels.</p></li>
+<li><p><strong>Number of Intersection Points</strong>: Number of skeleton points where vessels branch into two smaller vessels.</p></li>
+<li><p><strong>Median Branching Angle</strong>: Median value of the branching angle distribution evaluated for all blood vessels. Expressed in degrees (°).</p></li>
+<li><p><strong>Capacity Dimension</strong>: Also known as the box-counting dimension, measuring the space-filling capacity of the pattern.</p></li>
+<li><p><strong>Entropy Dimension</strong>: Also known as the entropy dimension, measuring the distribution of the pattern.</p></li>
+<li><p><strong>Correlation Dimension</strong>: Also known as the correlation dimension, measuring the correlation of the pattern.</p></li>
+<li><p><strong>Singularity Length</strong>: Range of fluctuation in the fractal dimension, providing insights into the complexity of local variations within the image.</p></li>
+<li><p><strong>Central Retinal Arteriolar Equivalent (Knudtson and Hubbard)</strong>: Central Retinal Arterial Equivalent (CRAE) computed using the Knudtson or Hubbard formula, estimating the caliber of the central retinal arteriole.</p></li>
+<li><p><strong>Central Retinal Venular Equivalent (Knudtson and Hubbard)</strong>: Central Retinal Venous Equivalent (CRVE) computed using the Knudtson or Hubbard formula, estimating the caliber of the central retinal vein.</p></li>
+<li><p><strong>Arterio-Venous Ratio (Knudtson and Hubbard)</strong>: The AVR is calculated using the ratios of CRAE and CRVE. This ratio assesses the relationship between retinal arterioles and venules, providing insights into vascular health and potential cardiovascular risk factors. (It is not included in the tutorial but can be easily inferred by dividing the CRAE by the CRVE.)</p></li>
+</ul>
+<p>Look at the <a class="reference external" href="https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb">tutorial</a> for a code example.</p>
+</section>
+<section id="artery-veins-blood-vessel-segmentation-datasets">
+<h2>Artery/Veins Blood Vessel Segmentation Datasets<a class="headerlink" href="#artery-veins-blood-vessel-segmentation-datasets" title="Permalink to this heading"></a></h2>
+<p>You can access the external test set used in the LUNet paper directly from PVBM:
+(These include Crop_HRF, INSPIRE, and UNAF.)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PVBM.Datasets</span> <span class="kn">import</span> <span class="n">PVBMDataDownloader</span>
+<span class="n">path_to_save_datasets</span> <span class="o">=</span> <span class="s2">&quot;../PVBM_datasets&quot;</span>
+<span class="n">dataset_downloader</span> <span class="o">=</span> <span class="n">PVBMDataDownloader</span><span class="p">()</span>
+<span class="n">dataset_downloader</span><span class="o">.</span><span class="n">download_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Crop_HRF&quot;</span><span class="p">,</span> <span class="n">save_folder_path</span><span class="o">=</span><span class="n">path_to_save_datasets</span><span class="p">)</span>
+<span class="n">dataset_downloader</span><span class="o">.</span><span class="n">download_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;INSPIRE&quot;</span><span class="p">,</span> <span class="n">save_folder_path</span><span class="o">=</span><span class="n">path_to_save_datasets</span><span class="p">)</span>
+<span class="n">dataset_downloader</span><span class="o">.</span><span class="n">download_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;UNAF&quot;</span><span class="p">,</span> <span class="n">save_folder_path</span><span class="o">=</span><span class="n">path_to_save_datasets</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Images downloaded successfully&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="optic-disc-segmentation">
+<h2>Optic Disc Segmentation<a class="headerlink" href="#optic-disc-segmentation" title="Permalink to this heading"></a></h2>
+<p>We have included an optic disc segmenter to perform more accurate VBM estimation. This has been done using LUNet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PVBM.DiscSegmenter</span> <span class="kn">import</span> <span class="n">DiscSegmenter</span>
+
+<span class="c1"># Initialize the segmenter</span>
+<span class="n">segmenter</span> <span class="o">=</span> <span class="n">DiscSegmenter</span><span class="p">()</span>
+
+<span class="c1"># Define the segmentation path and replace specific parts of the path</span>
+<span class="n">image_path</span> <span class="o">=</span> <span class="s1">&#39;../PVBM_datasets/INSPIRE/images/image13.png&#39;</span>
+<span class="c1"># Extract the segmentation</span>
+<span class="n">optic_disc</span> <span class="o">=</span> <span class="n">segmenter</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">image_path</span><span class="o">=</span><span class="n">image_path</span><span class="p">)</span>
+<span class="c1">#Extract the optic disc features</span>
+<span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">zones_ABC</span> <span class="o">=</span> <span class="n">segmenter</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">segmentation</span><span class="o">=</span><span class="n">optic_disc</span><span class="p">,</span> <span class="n">max_roi_size</span> <span class="o">=</span> <span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="geometrical-vbms">
+<h2>Geometrical VBMs<a class="headerlink" href="#geometrical-vbms" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">### First run the optic disc segmentation snippet to extract center, radius, roi, zones_ABC</span>
+
+<span class="kn">from</span> <span class="nn">PVBM.GeometryAnalysis</span> <span class="kn">import</span> <span class="n">GeometricalVBMs</span> <span class="c1">#Import the geometry analysis module</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="c1">#Preprocessing and roi extraction</span>
+<span class="n">blood_vessel_segmentation_path</span> <span class="o">=</span> <span class="s1">&#39;../PVBM_datasets/INSPIRE/artery/image13.png&#39;</span>
+<span class="n">segmentation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blood_vessel_segmentation_path</span><span class="p">))</span><span class="o">/</span><span class="mi">255</span> <span class="c1">#Open the segmentation</span>
+<span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">segmentation</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span>
+<span class="n">geometricalVBMs</span> <span class="o">=</span> <span class="n">GeometricalVBMs</span><span class="p">()</span> <span class="c1">#Instanciate a geometrical VBM object</span>
+<span class="n">segmentation_roi</span><span class="p">,</span> <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="n">geometricalVBMs</span><span class="o">.</span><span class="n">apply_roi</span><span class="p">(</span>
+    <span class="n">segmentation</span><span class="o">=</span><span class="n">segmentation</span><span class="p">,</span>
+    <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton</span><span class="p">,</span>
+    <span class="n">zones_ABC</span><span class="o">=</span><span class="n">zones_ABC</span><span class="p">,</span>
+    <span class="n">roi</span><span class="o">=</span><span class="n">roi</span>
+<span class="p">)</span>
+<span class="n">vbms</span><span class="p">,</span> <span class="n">visual</span> <span class="o">=</span> <span class="n">geometricalVBMs</span><span class="o">.</span><span class="n">compute_geomVBMs</span><span class="p">(</span>
+    <span class="n">blood_vessel</span><span class="o">=</span><span class="n">segmentation_roi</span><span class="p">,</span>
+    <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton_roi</span><span class="p">,</span>
+    <span class="n">xc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">yc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span>
+<span class="p">)</span>
+<span class="n">area</span><span class="p">,</span> <span class="n">TI</span><span class="p">,</span> <span class="n">medTor</span><span class="p">,</span> <span class="n">ovlen</span><span class="p">,</span> <span class="n">medianba</span><span class="p">,</span> <span class="n">startp</span><span class="p">,</span> <span class="n">endp</span><span class="p">,</span> <span class="n">interp</span> <span class="o">=</span> <span class="n">vbms</span>
+</pre></div>
+</div>
+</section>
+<section id="fractal-analysis">
+<h2>Fractal Analysis<a class="headerlink" href="#fractal-analysis" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">### First run the optic disc segmentation snippet to extract center, radius, roi, zones_ABC</span>
+<span class="c1">### Then compute the segmentation_roi array as done in the previous code snippet</span>
+
+<span class="kn">from</span> <span class="nn">PVBM.FractalAnalysis</span> <span class="kn">import</span> <span class="n">MultifractalVBMs</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">fractalVBMs</span> <span class="o">=</span> <span class="n">MultifractalVBMs</span><span class="p">(</span><span class="n">n_rotations</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span><span class="n">optimize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">min_proba</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">maxproba</span> <span class="o">=</span> <span class="mf">0.9999</span><span class="p">)</span>
+<span class="n">D0</span><span class="p">,</span><span class="n">D1</span><span class="p">,</span><span class="n">D2</span><span class="p">,</span><span class="n">SL</span> <span class="o">=</span> <span class="n">fractalVBMs</span><span class="o">.</span><span class="n">compute_multifractals</span><span class="p">(</span><span class="n">segmentation_roi</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="central-retinal-equivalent-analysis">
+<h2>Central Retinal Equivalent Analysis<a class="headerlink" href="#central-retinal-equivalent-analysis" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">### First run the optic disc segmentation snippet to extract center, radius, roi, zones_ABC</span>
+
+<span class="kn">from</span> <span class="nn">PVBM.CentralRetinalAnalysis</span> <span class="kn">import</span> <span class="n">CREVBMs</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="c1">#Preprocessing and roi extraction</span>
+<span class="n">creVBMs</span> <span class="o">=</span> <span class="n">CREVBMs</span><span class="p">()</span>
+
+<span class="c1">####Artery</span>
+<span class="n">blood_vessel_segmentation_path</span> <span class="o">=</span> <span class="s1">&#39;../PVBM_datasets/INSPIRE/artery/image13.png&#39;</span>
+<span class="n">segmentation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blood_vessel_segmentation_path</span><span class="p">))</span><span class="o">/</span><span class="mi">255</span> <span class="c1">#Open the segmentation</span>
+<span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">segmentation</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span>
+<span class="n">segmentation_roi</span><span class="p">,</span> <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="n">creVBMs</span><span class="o">.</span><span class="n">apply_roi</span><span class="p">(</span>
+    <span class="n">segmentation</span><span class="o">=</span><span class="n">segmentation</span><span class="p">,</span>
+    <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton</span><span class="p">,</span>
+    <span class="n">zones_ABC</span><span class="o">=</span><span class="n">zones_ABC</span>
+<span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">creVBMs</span><span class="o">.</span><span class="n">compute_central_retinal_equivalents</span><span class="p">(</span>
+    <span class="n">blood_vessel</span><span class="o">=</span><span class="n">segmentation_roi</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton_roi</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">xc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">yc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">artery</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">Toplot</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#This allows to generate the CRE visualisation but require a lot of RAM</span>
+    <span class="c1"># If you are only interested about the VBMs values then set Toplot to False</span>
+<span class="p">)</span>
+<span class="n">craek</span><span class="p">,</span> <span class="n">craeh</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;craek&quot;</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;craeh&quot;</span><span class="p">]</span>
+
+<span class="c1">####Veins</span>
+<span class="n">blood_vessel_segmentation_path</span> <span class="o">=</span> <span class="s1">&#39;../PVBM_datasets/INSPIRE/veins/image13.png&#39;</span>
+<span class="n">segmentation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blood_vessel_segmentation_path</span><span class="p">))</span><span class="o">/</span><span class="mi">255</span> <span class="c1">#Open the segmentation</span>
+<span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">segmentation</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span>
+<span class="n">segmentation_roi</span><span class="p">,</span> <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="n">creVBMs</span><span class="o">.</span><span class="n">apply_roi</span><span class="p">(</span>
+    <span class="n">segmentation</span><span class="o">=</span><span class="n">segmentation</span><span class="p">,</span>
+    <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton</span><span class="p">,</span>
+    <span class="n">zones_ABC</span><span class="o">=</span><span class="n">zones_ABC</span>
+<span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">creVBMs</span><span class="o">.</span><span class="n">compute_central_retinal_equivalents</span><span class="p">(</span>
+    <span class="n">blood_vessel</span><span class="o">=</span><span class="n">segmentation_roi</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton_roi</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">xc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">yc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">artery</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">Toplot</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#This allows to generate the CRE visualisation but require a lot of RAM</span>
+    <span class="c1"># If you are only interested about the VBMs values then set Toplot to False</span>
+<span class="p">)</span>
+<span class="n">crvek</span><span class="p">,</span> <span class="n">crveh</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;crvek&quot;</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;crveh&quot;</span><span class="p">]</span>
+
+<span class="n">AVR_h</span> <span class="o">=</span> <span class="n">craeh</span><span class="o">/</span><span class="n">crveh</span>
+<span class="n">AVR_k</span> <span class="o">=</span> <span class="n">craek</span><span class="o">/</span><span class="n">crvek</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CRAE_H: </span><span class="si">{</span><span class="n">craeh</span><span class="si">}</span><span class="s2">, CRAE_K: </span><span class="si">{</span><span class="n">craek</span><span class="si">}</span><span class="s2">,CRVE_H: </span><span class="si">{</span><span class="n">crveh</span><span class="si">}</span><span class="s2">, CRVE_K: </span><span class="si">{</span><span class="n">crvek</span><span class="si">}</span><span class="s2">, AVR_H: </span><span class="si">{</span><span class="n">AVR_h</span><span class="si">}</span><span class="s2">, AVR_K: </span><span class="si">{</span><span class="n">AVR_k</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this heading"></a></h2>
+<p>If you find this code or data to be useful for your research, please consider citing the following papers.</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">fhima2022pvbm</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{PVBM: a Python vasculature biomarker toolbox based on retinal blood vessel segmentation}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Fhima, Jonathan and Eijgen, Jan Van and Stalmans, Ingeborg and Men, Yevgeniy and Freiman, Moti and Behar, Joachim A}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">booktitle</span><span class="p">=</span><span class="s">{European Conference on Computer Vision}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">pages</span><span class="p">=</span><span class="s">{296--312}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2022}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">organization</span><span class="p">=</span><span class="s">{Springer}</span>
+<span class="p">}</span>
+
+<span class="nc">@article</span><span class="p">{</span><span class="nl">fhima2024lunet</span><span class="p">,</span>
+<span class="w">    </span><span class="na">title</span><span class="p">=</span><span class="s">{LUNet: deep learning for the segmentation of arterioles and venules in high resolution fundus images}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">author</span><span class="p">=</span><span class="s">{Fhima, Jonathan and Van Eijgen, Jan and Moulin-Roms{\&#39;e}e, Marie-Isaline Billen and Brackenier, Helo{\&quot;\i}se and Kulenovic, Hana and Debeuf, Val{\&#39;e}rie and Vangilbergen, Marie and Freiman, Moti and Stalmans, Ingeborg and Behar, Joachim A}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">journal</span><span class="p">=</span><span class="s">{Physiological Measurement}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">volume</span><span class="p">=</span><span class="s">{45}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">number</span><span class="p">=</span><span class="s">{5}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">pages</span><span class="p">=</span><span class="s">{055002}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">    </span><span class="na">publisher</span><span class="p">=</span><span class="s">{IOP Publishing}</span>
+<span class="p">}</span>
+
+<span class="nc">@article</span><span class="p">{</span><span class="nl">fhima2024computerized</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{Computerized analysis of the eye vasculature in a mass dataset of digital fundus images: the example of age, sex and primary open-angle glaucoma}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Fhima, Jonathan and Eijgen, Jan Van and Reiner-Benaim, Anat and Beeckmans, Lennert and Abramovich, Or and Stalmans, Ingeborg and Behar, Joachim A}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">journal</span><span class="p">=</span><span class="s">{medRxiv}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">pages</span><span class="p">=</span><span class="s">{2024--07}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="p">=</span><span class="s">{Cold Spring Harbor Laboratory Press}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Datasets.html" class="btn btn-neutral float-right" title="Datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, JF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

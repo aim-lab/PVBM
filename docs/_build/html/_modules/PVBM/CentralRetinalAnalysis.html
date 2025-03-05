@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PVBM.CentralRetinalAnalysis &mdash; PVBM 3.0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PVBM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DiscSegmenter.html">DiscSegmenter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LesionSegmenter.html">LesionSegmenter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GeometryAnalysis.html">GeometryAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../FractalAnalysis.html">FractalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CentralRetinalAnalysis.html">CentralRetinalAnalysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pvbmtutorial.html">PVBM Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PVBM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">PVBM.CentralRetinalAnalysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for PVBM.CentralRetinalAnalysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">convolve2d</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.tortuosity</span> <span class="kn">import</span> <span class="n">compute_tortuosity</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.perimeter</span> <span class="kn">import</span> <span class="n">compute_perimeter_</span>
+<span class="kn">from</span> <span class="nn">PVBM.helpers.branching_angle</span> <span class="kn">import</span> <span class="n">compute_angles_dictionary</span>
+<span class="c1">#from PVBM.helpers.far import far</span>
+<span class="kn">from</span> <span class="nn">PVBM.GraphRegularisation.GraphRegularisation</span> <span class="kn">import</span> <span class="n">TreeReg</span>
+<span class="kn">from</span> <span class="nn">PVBM.GraphCRE.GraphCentralRetinalEquivalent</span> <span class="kn">import</span> <span class="n">Tree</span>
+<div class="viewcode-block" id="CREVBMs"><a class="viewcode-back" href="../../CentralRetinalAnalysis.html#PVBM.CentralRetinalAnalysis.CREVBMs">[docs]</a><span class="k">class</span> <span class="nc">CREVBMs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class that can perform geometrical biomarker computation for a fundus image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">extract_subgraphs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">graphs</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract B, the a graph where each of the disconnected subgraph is labeled differently and D which contains the euclidian distance graph between each</span>
+<span class="sd">        point in the graph and the optic disc.</span>
+
+<span class="sd">        :param graphs: Original blood vessel segmentation graph</span>
+<span class="sd">        :type graphs: array</span>
+<span class="sd">        :param x_c: x axis of the optic disc center</span>
+<span class="sd">        :type x_c: int</span>
+<span class="sd">        :param y_c: y axis of the optic disc center</span>
+<span class="sd">        :type y_c: int</span>
+
+<span class="sd">        :return: B,D</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">graphs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">graphs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">graphs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">recursive_subgraph</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">)</span>
+                    <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span>
+
+    <span class="k">def</span> <span class="nf">recursive_subgraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively extract the value within B and D.</span>
+
+<span class="sd">        :param A: Original blood vessel segmentation graph</span>
+<span class="sd">        :type A: array</span>
+<span class="sd">        :param B: A graph where each of the disconnected subgraph is labeled differentl, which is initialized by a zeros matrix and recursively built</span>
+<span class="sd">        :type B: array</span>
+<span class="sd">        :param D: Euclidian Distance graph between each point in A and the optic disc center (x_c,y_c), which is initialized by a zeros matrix and recursively built</span>
+<span class="sd">        :type D: array</span>
+<span class="sd">        :param i: Current x axis location within the graph</span>
+<span class="sd">        :type i: int</span>
+<span class="sd">        :param j: Current y axis location within the graph</span>
+<span class="sd">        :type j: int</span>
+<span class="sd">        :param n: Current number of point distance since the optic disc</span>
+<span class="sd">        :type n: int</span>
+<span class="sd">        :param x_c: x axis of the optic disc center</span>
+<span class="sd">        :type x_c: int</span>
+<span class="sd">        :param y_c: y axis of the optic disc center</span>
+<span class="sd">        :type y_c: int</span>
+
+<span class="sd">        :return: B,D</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">up_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">up_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">down_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">down_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">up</span><span class="p">,</span> <span class="n">down</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">up_left</span><span class="p">,</span> <span class="n">up_right</span><span class="p">,</span> <span class="n">down_left</span><span class="p">,</span> <span class="n">down_right</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">A</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">B</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+                    <span class="n">A</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">D</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">y_c</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">x_c</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">recursive_subgraph</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">central_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span><span class="n">formula</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively compute the central retinal equivalent given a list of blood vessel measurement and a formula to</span>
+
+<span class="sd">        :param l: list of blood vessel measurements</span>
+<span class="sd">        :type l: List</span>
+<span class="sd">        :param formula: One of the following formulas: PVBM.CentralRetinalAnalysis.crae_hubbard, PVBM.CentralRetinalAnalysis.crve_hubbard, PVBM.CentralRetinalAnalysis.crae_knudtson or PVBM.CentralRetinalAnalysis.crve_knudtson</span>
+<span class="sd">        :type formula: python function</span>
+
+<span class="sd">        :return: the computed central retinal equivalent VBM</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">l</span><span class="p">[:])</span>
+        <span class="n">new_l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pivot</span> <span class="o">=</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">idx_pivot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+            <span class="n">pivot</span> <span class="o">=</span>  <span class="n">l</span><span class="p">[</span><span class="n">idx_pivot</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">new_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">formula</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">pivot</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pivot</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">new_l</span><span class="p">,</span><span class="n">formula</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">crae_hubbard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive formulas of the Central Retinal Arteriolar Equivalent according to Hubbard et al.</span>
+<span class="sd">        :param w1: w1 vessel measurement</span>
+<span class="sd">        :type w1: float</span>
+<span class="sd">        :param w2: w2 vessel measurement</span>
+<span class="sd">        :type w2: float</span>
+
+<span class="sd">        :return: the root vessel of w1 and w2 estimation</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">0.87</span> <span class="o">*</span> <span class="n">w1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">1.01</span> <span class="o">*</span> <span class="n">w2</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.22</span> <span class="o">*</span> <span class="n">w1</span> <span class="o">*</span> <span class="n">w2</span> <span class="o">-</span> <span class="mf">10.76</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span> <span class="nf">crve_hubbard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive formulas of the Central Retinal Venular Equivalent according to Hubbard et al.</span>
+<span class="sd">        :param w1: w1 vessel measurement</span>
+<span class="sd">        :type w1: float</span>
+<span class="sd">        :param w2: w2 vessel measurement</span>
+<span class="sd">        :type w2: float</span>
+
+<span class="sd">        :return: the root vessel of w1 and w2 estimation</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">0.72</span> <span class="o">*</span> <span class="n">w1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.91</span> <span class="o">*</span> <span class="n">w2</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">450.05</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span> <span class="nf">crae_knudtson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive formulas of the Central Retinal Arteriolar Equivalent according to Knudtson et al.</span>
+<span class="sd">        :param w1: w1 vessel measurement</span>
+<span class="sd">        :type w1: float</span>
+<span class="sd">        :param w2: w2 vessel measurement</span>
+<span class="sd">        :type w2: float</span>
+
+<span class="sd">        :return: the root vessel of w1 and w2 estimation</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.88</span> <span class="o">*</span> <span class="p">(</span><span class="n">w1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">w2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span> <span class="nf">crve_knudtson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive formulas of the Central Retinal Venular Equivalent according to Knudtson et al.</span>
+<span class="sd">        :param w1: w1 vessel measurement</span>
+<span class="sd">        :type w1: float</span>
+<span class="sd">        :param w2: w2 vessel measurement</span>
+<span class="sd">        :type w2: float</span>
+
+<span class="sd">        :return: the root vessel of w1 and w2 estimation</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.95</span> <span class="o">*</span> <span class="p">(</span><span class="n">w1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">w2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+
+<div class="viewcode-block" id="CREVBMs.apply_roi"><a class="viewcode-back" href="../../CentralRetinalAnalysis.html#PVBM.CentralRetinalAnalysis.CREVBMs.apply_roi">[docs]</a>    <span class="k">def</span> <span class="nf">apply_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segmentation</span><span class="p">,</span> <span class="n">skeleton</span><span class="p">,</span> <span class="n">zones_ABC</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a region of interest (ROI) mask to the segmentation and skeleton images.</span>
+
+<span class="sd">        :param segmentation: The segmentation image containing binary values within {0, 1}.</span>
+<span class="sd">        :type segmentation: np.array</span>
+<span class="sd">        :param skeleton: The skeleton image containing binary values within {0, 1}.</span>
+<span class="sd">        :type skeleton: np.array</span>
+<span class="sd">        :param zones_ABC: A mask image used to exclude specific zones, where the second channel defines the exclusion areas.</span>
+<span class="sd">        :type zones_ABC: np.array</span>
+
+<span class="sd">        :return: A tuple containing:</span>
+<span class="sd">            - The modified segmentation image with the ROI applied.</span>
+<span class="sd">            - The modified skeleton image with the ROI applied.</span>
+<span class="sd">        :rtype: Tuple[np.array, np.array]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">zone_A_</span> <span class="o">=</span> <span class="n">zones_ABC</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>
+        <span class="n">zone_B_</span> <span class="o">=</span> <span class="n">zones_ABC</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>
+        <span class="n">zone_C_</span> <span class="o">=</span> <span class="n">zones_ABC</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="p">(</span><span class="n">zone_C_</span> <span class="o">-</span> <span class="n">zone_B_</span><span class="p">)</span>
+        <span class="n">segmentation_roi</span> <span class="o">=</span> <span class="p">(</span><span class="n">segmentation</span> <span class="o">*</span> <span class="n">roi</span><span class="p">)</span>
+        <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="p">(</span><span class="n">skeleton</span> <span class="o">*</span> <span class="n">roi</span><span class="p">)</span>
+
+
+        <span class="k">return</span> <span class="n">segmentation_roi</span><span class="p">,</span> <span class="n">skeleton_roi</span></div>
+
+<div class="viewcode-block" id="CREVBMs.compute_central_retinal_equivalents"><a class="viewcode-back" href="../../CentralRetinalAnalysis.html#PVBM.CentralRetinalAnalysis.CREVBMs.compute_central_retinal_equivalents">[docs]</a>    <span class="k">def</span> <span class="nf">compute_central_retinal_equivalents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">blood_vessel</span><span class="p">,</span> <span class="n">skeleton</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">artery</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">Toplot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the CRAE or CRVE equivalent for a given blood vessel graph.</span>
+
+<span class="sd">        :param blood_vessel: blood_vessel segmentation containing binary values within {0,1}</span>
+<span class="sd">        :type blood_vessel: np.array</span>
+<span class="sd">        :param skeleton: blood_vessel segmentation skeleton containing binary values within {0,1}</span>
+<span class="sd">        :type skeleton: np.array</span>
+<span class="sd">        :param xc: x axis of the optic disc center</span>
+<span class="sd">        :type xc: int</span>
+<span class="sd">        :param yc: y axis of the optic disc center</span>
+<span class="sd">        :type yc: int</span>
+<span class="sd">        :param radius: radius in pixel of the optic disc</span>
+<span class="sd">        :type radius: int</span>
+<span class="sd">        :param artery: Flag to decide if to use CRAE or CRVE formulas (artery to True means CRAE, and to False means CRVE)</span>
+<span class="sd">        :type artery: Bool</span>
+<span class="sd">        :param Toplot: Flag to decide if to store the visualisation element. (Setting it to true use more RAM)</span>
+<span class="sd">        :type Toplot: Bool</span>
+
+
+<span class="sd">        :return: A tuple containing:</span>
+<span class="sd">            - A result dictionnary (Dict): Dictionnary containing the computer CRE (-1 if it has failed)</span>
+<span class="sd">            - plotable_list (List): A summary that contains the topology information required to plot the visualisation (really useful when Toplot is True). Return None if the computation has failed.</span>
+<span class="sd">        :rtype: Tuple[Dict, List]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">radius_zone_C</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">radius</span><span class="p">)</span>
+        <span class="c1">## Extract the distances graphs</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_subgraphs</span><span class="p">(</span><span class="n">graphs</span><span class="o">=</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">x_c</span><span class="o">=</span><span class="n">xc</span><span class="p">,</span> <span class="n">y_c</span><span class="o">=</span><span class="n">yc</span><span class="p">)</span>
+
+        <span class="c1">## Extract the starting points list by navigating through the skeleton graph</span>
+        <span class="n">starting_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">skeleton</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skeleton</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> <span class="o">-</span> <span class="p">{</span><span class="mi">0</span><span class="p">}:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">B</span> <span class="o">==</span> <span class="n">i</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">:</span>
+                <span class="n">min_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">D</span> <span class="o">*</span> <span class="n">mask</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mask</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e10</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                <span class="n">min_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">min_index</span><span class="p">,</span> <span class="n">D</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="c1"># print(((min_coordinates[0] - yc)**2 + (min_coordinates[1] - xc)**2)**0.5)</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">min_coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">yc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">min_coordinates</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">&lt;</span> <span class="mi">20</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="p">:</span>
+                    <span class="n">starting_points</span><span class="p">[</span><span class="n">min_coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_coordinates</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">starting_point_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">starting_points</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="c1">### Cleaning the skeleton graph irregularities</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">tree_reg_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">idx_start</span> <span class="ow">in</span> <span class="n">starting_point_list</span><span class="p">:</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">TreeReg</span><span class="p">(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">recursive_reg</span><span class="p">(</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">plot</span><span class="p">)</span>
+            <span class="n">tree_reg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+        <span class="n">plot_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tree_reg</span> <span class="ow">in</span> <span class="n">tree_reg_list</span><span class="p">:</span>
+            <span class="n">plot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">tree_reg</span><span class="o">.</span><span class="n">print_reg</span><span class="p">(</span><span class="n">tree_reg</span><span class="p">,</span> <span class="n">plot</span><span class="p">)</span>
+            <span class="n">plot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">skoustideB_reg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">plot_list</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">skeleton</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">skeleton</span><span class="p">)</span>
+        <span class="n">plotted_tmp</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">Toplot</span> <span class="ow">is</span> <span class="kc">False</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1">#####Initialising a dictionary that will be used to store the topology of th graph</span>
+        <span class="n">dico</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1">####Navigating through the graph to fill the the topology dico</span>
+        <span class="k">for</span> <span class="n">idx_start</span> <span class="ow">in</span> <span class="n">starting_point_list</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx_start</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">((</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">iterative_CRE</span><span class="p">(</span><span class="n">skeleton</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plotted_tmp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">blood_vessel</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span>
+                            <span class="n">radius_zone_C</span><span class="p">)</span>
+
+            <span class="n">dico</span><span class="p">[(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">tree</span>
+
+        <span class="n">tree_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dico</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="c1">####Second graph navigation to check consistency of the topology dico (parent vessel is supposed to be bigger than its children).</span>
+        <span class="n">final_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree_list</span><span class="p">)):</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tree_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">print_correct</span><span class="p">(</span><span class="n">tree_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">max_d</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startpoint</span> <span class="o">!=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">startpoint</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">diameter_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                        <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">diameter_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Potential error&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">idx_start</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startpoint</span>
+                    <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx_start</span>
+                    <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">((</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="n">tree</span><span class="o">.</span><span class="n">iterative_CRE</span><span class="p">(</span><span class="n">skoustideB_reg</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                                    <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plotted_tmp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">blood_vessel</span><span class="p">,</span>
+                                    <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">radius_zone_C</span><span class="p">)</span>
+                    <span class="n">final_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>  <span class="c1"># .remove_children())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">final_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>  <span class="c1"># .remove_children())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">final_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># .remove_children())</span>
+
+        <span class="c1">### Aggregating the topology dico results</span>
+        <span class="n">plotable_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">final_list</span><span class="p">:</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">plotable_show_tree</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">,</span> <span class="n">blood_vessel</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">Toplot</span> <span class="o">=</span> <span class="n">Toplot</span><span class="p">)</span>
+        <span class="c1">### Compute and return the CRE VBMs</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">blood_vessel_lista</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">blood_vessel_lista</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Mean diameter&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">)):</span>
+                <span class="n">blood_vessel_lista</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plotable_list</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;Mean diameter&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">artery</span><span class="p">:</span>
+                <span class="n">craek</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">blood_vessel_lista</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">crae_knudtson</span><span class="p">)</span>
+                <span class="n">craeh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">blood_vessel_lista</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">crae_hubbard</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">({</span><span class="s2">&quot;craek&quot;</span><span class="p">:</span> <span class="n">craek</span><span class="p">,</span> <span class="s2">&quot;craeh&quot;</span><span class="p">:</span><span class="n">craeh</span><span class="p">},</span> <span class="n">plotable_list</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">crvek</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">blood_vessel_lista</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">crve_knudtson</span><span class="p">)</span>
+                <span class="n">crveh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">central_equivalent</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">blood_vessel_lista</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">crve_hubbard</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">({</span><span class="s2">&quot;crvek&quot;</span><span class="p">:</span> <span class="n">crvek</span><span class="p">,</span> <span class="s2">&quot;crveh&quot;</span><span class="p">:</span> <span class="n">crveh</span><span class="p">},</span> <span class="n">plotable_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">artery</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">({</span><span class="s2">&quot;craek&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;craeh&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">({</span><span class="s2">&quot;crvek&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;crveh&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">skeletonize</span>
+    <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="mi">460</span><span class="p">,</span><span class="mi">689</span><span class="p">)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mi">110</span>
+
+    <span class="n">blood_vessel_segmentation_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/jonathanfhima/Desktop/test123/segmentation/seg.png&#39;</span>
+    <span class="n">segmentation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blood_vessel_segmentation_path</span><span class="p">))</span> <span class="o">/</span> <span class="mi">255</span>  <span class="c1"># Open the segmentation</span>
+    <span class="n">segmentation</span> <span class="o">=</span> <span class="n">segmentation</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">skeleton</span> <span class="o">=</span> <span class="n">skeletonize</span><span class="p">(</span><span class="n">segmentation</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
+    <span class="n">creVBM</span> <span class="o">=</span> <span class="n">CREVBMs</span><span class="p">()</span>  <span class="c1"># Instanciate a geometrical VBM object</span>
+
+    <span class="c1">#roi = &#39;/Users/jonathanfhima/Library/Containers/13E15484-8207-4BD5-BEA5-CB0FAD85FCF7/Data/Documents/test123/ROI/DR_2_ICDR.jpg&#39;</span>
+    <span class="c1">#roi = np.array(Image.open(roi))</span>
+
+    <span class="n">zones_ABC</span> <span class="o">=</span> <span class="s1">&#39;/Users/jonathanfhima/Desktop/test123/zones_ABC/zones.jpg&#39;</span>
+    <span class="n">zones_ABC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">zones_ABC</span><span class="p">))</span>
+
+    <span class="n">segmentation_roi</span><span class="p">,</span> <span class="n">skeleton_roi</span> <span class="o">=</span> <span class="n">creVBM</span><span class="o">.</span><span class="n">apply_roi</span><span class="p">(</span>
+        <span class="n">segmentation</span><span class="o">=</span><span class="n">segmentation</span><span class="p">,</span>
+        <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton</span><span class="p">,</span>
+        <span class="n">zones_ABC</span><span class="o">=</span><span class="n">zones_ABC</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">vbms</span><span class="p">,</span> <span class="n">visual</span> <span class="o">=</span> <span class="n">creVBM</span><span class="o">.</span><span class="n">compute_central_retinal_equivalents</span><span class="p">(</span>
+        <span class="n">blood_vessel</span><span class="o">=</span><span class="n">segmentation_roi</span><span class="p">,</span>
+        <span class="n">skeleton</span><span class="o">=</span><span class="n">skeleton_roi</span><span class="p">,</span>
+        <span class="n">xc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">yc</span><span class="o">=</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">radius</span><span class="o">=</span><span class="n">radius</span>
+    <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, JF.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
