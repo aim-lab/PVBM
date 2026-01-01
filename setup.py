@@ -10,7 +10,7 @@ long_description = read_readme("README.md")
 
 setup(
     name='pvbm',
-    version='3.0.0.0',
+    version='3.0.1.0',
     packages=find_packages(),
     include_package_data=True,  # Ensure non-Python files are included
     package_data={
