@@ -10,11 +10,11 @@ long_description = read_readme("README.md")
 
 setup(
     name='pvbm',
-    version='3.0.1.0',
+    version='3.0.1.1',
     packages=find_packages(),
     include_package_data=True,  # Ensure non-Python files are included
     package_data={
-        "": ["*.onnx"],  # Include all .onnx files in all subdirectories
+        "": ["*.onnx", "*.ipynb"],  # Include all .onnx and .ipynb files in all subdirectories
     },
     install_requires=[
         "numpy",
@@ -25,7 +25,8 @@ setup(
         "onnxruntime",
         "torchvision",
         "opencv-python",
-        "matplotlib"
+        "matplotlib",
+        "huggingface_hub"
     ],
     author='Jonathan Fhima, Yevgeniy Men',
     author_email='jonathanfh@campus.technion.ac.il',
