@@ -152,7 +152,7 @@ segmentation_roi, skeleton_roi = creVBMs.apply_roi(
     skeleton=skeleton,
     zones_ABC=zones_ABC
 )
-out = creVBMs.compute_central_retinal_equivalents(
+out, _ = creVBMs.compute_central_retinal_equivalents(
     blood_vessel=segmentation_roi.copy(),
     skeleton=skeleton_roi.copy(),
     xc=center[0],
@@ -162,7 +162,7 @@ out = creVBMs.compute_central_retinal_equivalents(
     Toplot = False #This allows to generate the CRE visualisation but require a lot of RAM
     # If you are only interested about the VBMs values then set Toplot to False
 )
-craek, craeh = out["craek"], out["craeh"]
+craek, craeh = out["craek"], out["craeh"]  # out = (result_dict, plot_list)
 
 ####Veins
 blood_vessel_segmentation_path = '../PVBM_datasets/INSPIRE/veins/image13.png'
@@ -173,7 +173,7 @@ segmentation_roi, skeleton_roi = creVBMs.apply_roi(
     skeleton=skeleton,
     zones_ABC=zones_ABC
 )
-out = creVBMs.compute_central_retinal_equivalents(
+out, _ = creVBMs.compute_central_retinal_equivalents(
     blood_vessel=segmentation_roi.copy(),
     skeleton=skeleton_roi.copy(),
     xc=center[0],
