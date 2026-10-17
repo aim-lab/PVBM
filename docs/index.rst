@@ -15,6 +15,8 @@
    :target: https://github.com/aim-lab/PVBM
 .. image:: https://img.shields.io/badge/tutorial-GitHub-purple
    :target: https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb
+.. image:: https://img.shields.io/badge/RLAD_%2B_PVBM_tutorial-Colab-orange
+   :target: https://colab.research.google.com/github/aim-lab/PVBM/blob/main/rlad_pvbm_tutorial.ipynb
 .. image:: https://img.shields.io/badge/Download_on_the-App_Store-teal.svg
    :target: https://apps.apple.com/fr/app/lirot-ai/id6478242092
 
