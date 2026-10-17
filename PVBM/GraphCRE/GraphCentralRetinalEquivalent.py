@@ -86,19 +86,32 @@ class Tree:
             - first_tree (PVBM.GraphCentralRetinalEquivalent.Tree): The first subtree that met the diameter criteria.
         :rtype: Tuple[PVBM.GraphCentralRetinalEquivalent.Tree, float, PVBM.GraphCentralRetinalEquivalent.Tree]
         """
-        if len(self.diameter_list) > 0:
-            d = np.mean(self.diameter_list)
-            if d > max_d:
-                saved_tree = self
-                max_d = d
-                if first_tree == 0:
-                    first_tree = self
-        if len(self.children) >= 1:
-            return max(
-                [(saved_tree, max_d, first_tree)] + [children.print_correct(saved_tree, max_d, first_tree) for children
-                                                     in self.children], key=lambda item: item[1])
-        else:
-            return saved_tree, max_d, first_tree
+        # Implemented as an explicit stack walk (rather than Python recursion): tree depth tracks vessel
+        # length, and a Python-recursive implementation can require very deep call stacks on dense,
+        # high-resolution segmentations. Each child call is seeded with its parent's current best
+        # (saved_tree, max_d, first_tree) exactly as in the recursive version, so results are identical.
+        results = {}
+        stack = [(self, saved_tree, max_d, first_tree, False)]
+        while stack:
+            node, node_saved, node_max_d, node_first, expanded = stack.pop()
+            if not expanded:
+                if len(node.diameter_list) > 0:
+                    d = np.mean(node.diameter_list)
+                    if d > node_max_d:
+                        node_saved = node
+                        node_max_d = d
+                        if node_first == 0:
+                            node_first = node
+                if len(node.children) == 0:
+                    results[id(node)] = (node_saved, node_max_d, node_first)
+                else:
+                    stack.append((node, node_saved, node_max_d, node_first, True))
+                    for child in node.children:
+                        stack.append((child, node_saved, node_max_d, node_first, False))
+            else:
+                candidates = [(node_saved, node_max_d, node_first)] + [results[id(child)] for child in node.children]
+                results[id(node)] = max(candidates, key=lambda item: item[1])
+        return results[id(self)]
 
     def plotable_show_tree(self, l, shape, Toplot = False):
         """
@@ -118,13 +131,13 @@ class Tree:
         """
         if len(self.diameter_list) > 0:
             if Toplot:
-                p = np.zeros((shape[0], shape[1]))
+                p = np.zeros((shape[0], shape[1]), dtype=np.float32)
                 tmp = self.plot_list  # [2:-2]
                 for i in range(len(tmp)):
                     # print(i)
                     if i % 1 == 0:
                         p += tmp[i]
-                tmp2 = np.zeros((shape[0], shape[1], 4))
+                tmp2 = np.zeros((shape[0], shape[1], 4), dtype=np.float32)
                 tmp2[:, :, 3] = dilation(p, square(3))
                 tmp2[:, :, 1] = dilation(p, square(3))
             dico_output = {}
@@ -422,8 +435,6 @@ class Tree:
 
             # If more than one child, add children and reset state
             elif children > 1:
-                if np.mean(curtree.diameter_list) * 6 > 80 and len(curtree.diameter_list) > 30:
-                    pass  # Handle special condition if needed
                 curtree = curtree.add_children((i, j))
                 if plotted_tmp is not None:
                     plotted_tmp = np.zeros((A.shape[0], A.shape[1]))
