@@ -4,6 +4,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/pvbm.svg?color=orange)](https://pypi.org/project/pvbm/)
 [![GitHub](https://img.shields.io/badge/github-repo-lightgrey)](https://github.com/aim-lab/PVBM)
 [![Tutorial](https://img.shields.io/badge/tutorial-GitHub-purple)](https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb)
+[![RLAD + PVBM Tutorial](https://img.shields.io/badge/RLAD_%2B_PVBM_tutorial-Colab-orange)](https://colab.research.google.com/github/aim-lab/PVBM/blob/main/rlad_pvbm_tutorial.ipynb)
 [![Download on the App Store](https://img.shields.io/badge/Download_on_the-App_Store-teal.svg)](https://apps.apple.com/fr/app/lirot-ai/id6478242092)
 
 <h1 align="center">
@@ -55,7 +56,7 @@ Fifteen biomarkers have been engineered independently on the arterioles and venu
 * **Central Retinal Venular Equivalent (Knudtson and Hubbard)**: Central Retinal Venous Equivalent (CRVE) computed using the Knudtson or Hubbard formula, estimating the caliber of the central retinal vein.
 * **Arterio-Venous Ratio (Knudtson and Hubbard)**: The AVR is calculated using the ratios of CRAE and CRVE. This ratio assesses the relationship between retinal arterioles and venules, providing insights into vascular health and potential cardiovascular risk factors. (It is not included in the tutorial but can be easily inferred by dividing the CRAE by the CRVE.)
 
-Look at the [tutorial](https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb) for a code example.
+Look at the [tutorial](https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb) for a code example, or the [RLAD + PVBM end-to-end tutorial](https://github.com/aim-lab/PVBM/blob/main/rlad_pvbm_tutorial.ipynb) for a full pipeline starting from a raw fundus image, segmented with [RLAD-SwinV2-Large](https://huggingface.co/JonathanFhima/RLAD-SwinV2-Large).
 
 ### Artery/Veins Blood Vessel Segmentation Datasets
 
