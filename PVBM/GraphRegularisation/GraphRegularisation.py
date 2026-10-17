@@ -28,7 +28,11 @@ class TreeReg:
 
     def recursive_reg(self,A, i, j, n, tree, plot):
         """
-        A recursive function that iterate through the continuous graph and store the children of each node as well as its number of ancestor
+        Iterate through the continuous graph and store the children of each node as well as its number of ancestor.
+
+        Implemented as an explicit depth-first stack walk (rather than Python recursion) so that long,
+        densely-connected vessel skeletons do not require deep call stacks, which can exhaust available
+        memory on dense, high-resolution segmentations.
 
         :param A: skeleton of the segmentation
         :type A: np.float
@@ -44,41 +48,72 @@ class TreeReg:
         :type plot: np.array
 
         """
-        up = (i - 1, j)
-        down = (i + 1, j)
-        left = (i, j - 1)
-        right = (i, j + 1)
+        def neighbors(i, j):
+            return [
+                (i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1),
+                (i - 1, j - 1), (i - 1, j + 1), (i + 1, j - 1), (i + 1, j + 1),
+            ]
 
-        up_left = (i - 1, j - 1)
-        up_right = (i - 1, j + 1)
-        down_left = (i + 1, j - 1)
-        down_right = (i + 1, j + 1)
-        points = [up, down, left, right, up_left, up_right, down_left, down_right]
-        children = np.sum([A[point] for point in points if
-                           (point[0] >= 0 and point[1] >= 0 and point[0] < A.shape[0] and point[1] < A.shape[1])])
-        if children >= 1:
-            plot[i, j] = 1
+        def mark_plot(i, j, points):
+            children = np.sum([A[point] for point in points if
+                               (point[0] >= 0 and point[1] >= 0 and point[0] < A.shape[0] and point[1] < A.shape[1])])
+            if children >= 1:
+                plot[i, j] = 1
 
-        for point in points:
-            if point[0] >= 0 and point[0] < A.shape[0] and point[1] < A.shape[1] and point[1] >= 0:
-                if A[point] == 1:
-                    tree__ = tree.add_children(point[0], point[1])
-                    A[point] = 0
-                    self.recursive_reg(A, point[0], point[1], n + 1, tree__, plot)
+        points = neighbors(i, j)
+        mark_plot(i, j, points)
+        # Each stack frame mirrors one active call of the recursive version: [i, j, tree, points, next_idx].
+        # A child is pushed and fully drained (mirroring an immediate recursive call) before its parent
+        # frame resumes scanning the rest of its own points, so the order in which `A` is consumed - and
+        # therefore every `children` sum computed along the way - matches the recursive implementation exactly.
+        stack = [[i, j, tree, points, 0]]
+        while stack:
+            frame = stack[-1]
+            fi, fj, ftree, fpoints, fidx = frame
+            advanced = False
+            while fidx < len(fpoints):
+                point = fpoints[fidx]
+                fidx += 1
+                if point[0] >= 0 and point[0] < A.shape[0] and point[1] < A.shape[1] and point[1] >= 0:
+                    if A[point] == 1:
+                        frame[4] = fidx
+                        child_tree = ftree.add_children(point[0], point[1])
+                        A[point] = 0
+                        child_points = neighbors(point[0], point[1])
+                        mark_plot(point[0], point[1], child_points)
+                        stack.append([point[0], point[1], child_tree, child_points, 0])
+                        advanced = True
+                        break
+            if not advanced:
+                stack.pop()
 
     def print_reg(self,tree, plot):
         """
-        A recursive function that correct graphs irregularities by removing children branch which contains less than 10 pixels
+        Correct graph irregularities by removing children branches which contain less than 10 pixels.
+
+        Implemented as an explicit iterative post-order walk (rather than Python recursion) for the same
+        reason as :meth:`recursive_reg`: tree depth tracks vessel length, and a Python-recursive
+        implementation can require very deep call stacks on dense, high-resolution segmentations.
 
         :type tree: PVBM.GraphRegularisation.GraphRegularisation.TreeReg
         :param plot: A numpy array where the corrected graph is saved
         :type plot: np.array
 
         """
-        if len(tree.children) == 0:
-            return 1
-        else:
-            n = 1 + sum([self.print_reg(child, plot) for child in tree.children])
-            if n >= 10:
-                plot[tree.plot] = 1
-            return n
+        values = {}
+        stack = [(tree, False)]
+        while stack:
+            node, expanded = stack.pop()
+            if expanded:
+                if len(node.children) == 0:
+                    values[id(node)] = 1
+                else:
+                    n = 1 + sum(values[id(child)] for child in node.children)
+                    if n >= 10:
+                        plot[node.plot] = 1
+                    values[id(node)] = n
+            else:
+                stack.append((node, True))
+                for child in node.children:
+                    stack.append((child, False))
+        return values[id(tree)]
