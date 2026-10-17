@@ -40,6 +40,7 @@ Jonathan Fhima • Jan Van Eijgen • Ingeborg Stalmans • Yevgeniy Men • Mot
    CentralRetinalAnalysis
 
    pvbmtutorial
+   rlad_pvbm_tutorial
 
 
 Installation
@@ -77,7 +78,7 @@ Fifteen biomarkers have been engineered independently on the arterioles and venu
 * **Central Retinal Venular Equivalent (Knudtson and Hubbard)**: Central Retinal Venous Equivalent (CRVE) computed using the Knudtson or Hubbard formula, estimating the caliber of the central retinal vein.
 * **Arterio-Venous Ratio (Knudtson and Hubbard)**: The AVR is calculated using the ratios of CRAE and CRVE. This ratio assesses the relationship between retinal arterioles and venules, providing insights into vascular health and potential cardiovascular risk factors. (It is not included in the tutorial but can be easily inferred by dividing the CRAE by the CRVE.)
 
-Look at the `tutorial <https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb>`_ for a code example.
+Look at the `tutorial <https://github.com/aim-lab/PVBM/blob/main/pvbmtutorial.ipynb>`_ for a code example, or the `RLAD + PVBM end-to-end tutorial <https://github.com/aim-lab/PVBM/blob/main/rlad_pvbm_tutorial.ipynb>`_ for a full pipeline starting from a raw fundus image, segmented with `RLAD-SwinV2-Large <https://huggingface.co/JonathanFhima/RLAD-SwinV2-Large>`_.
 
 Artery/Veins Blood Vessel Segmentation Datasets
 ===============================================
@@ -182,7 +183,7 @@ Central Retinal Equivalent Analysis
        skeleton=skeleton,
        zones_ABC=zones_ABC
    )
-   out = creVBMs.compute_central_retinal_equivalents(
+   out, _ = creVBMs.compute_central_retinal_equivalents(
        blood_vessel=segmentation_roi.copy(),
        skeleton=skeleton_roi.copy(),
        xc=center[0],
@@ -203,7 +204,7 @@ Central Retinal Equivalent Analysis
        skeleton=skeleton,
        zones_ABC=zones_ABC
    )
-   out = creVBMs.compute_central_retinal_equivalents(
+   out, _ = creVBMs.compute_central_retinal_equivalents(
        blood_vessel=segmentation_roi.copy(),
        skeleton=skeleton_roi.copy(),
        xc=center[0],
