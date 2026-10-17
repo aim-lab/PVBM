@@ -6,7 +6,6 @@ import PIL
 from PIL import Image
 from torchvision import transforms
 import cv2
-import gdown
 
 
 class DiscSegmenter:
@@ -20,14 +19,14 @@ class DiscSegmenter:
         self.download_model()
 
     def download_model(self):
-        """Download the ONNX model from Google Drive if it does not exist."""
-        file_id = "116EEFBn7qr_LpCBb8GBuyzpa_KGp4xPX"
-        url = f"https://drive.google.com/uc?id={file_id}"
-
+        """Download the ONNX model from Hugging Face Hub if it does not exist."""
         print(f"Model path: {self.model_path}")
         if not os.path.exists(self.model_path):
-            print(f"Downloading model from Google Drive...")
-            gdown.download(url, self.model_path, quiet=False)
+            print(f"Downloading model from Hugging Face Hub...")
+            from huggingface_hub import hf_hub_download
+            import shutil
+            src = hf_hub_download("JonathanFhima/RLAD-SwinV2-Large", "pvbm/lunetv2_odc.onnx")
+            shutil.copy(src, self.model_path)
             print(f"Model downloaded to {self.model_path}")
         else:
             print("Model already exists, skipping download.")
